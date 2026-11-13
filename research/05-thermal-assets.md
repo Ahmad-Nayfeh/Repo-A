@@ -227,6 +227,9 @@ All three examples were **reproduced numerically in this session** from the veri
 
 ## 3. Cables
 
+> **D-004 notice (lead, after round 2):** every item below citing [TH-10] comes from an alfanar catalogue (the owner's employer). Per D-004 these values are **EXCLUDED from the game model** and kept only as historical research trail. Replacements: Saudi Cable Company catalogue and other non-employer sources in `11-assets-round2.md`. The "130 °C emergency / 1500 h" rule has no non-employer source; the model uses the AEIC/ICEA 105 °C emergency limit instead (see 11).
+
+
 ### 3.1 Temperatures (XLPE), verified [TH-10]
 - Continuous conductor temperature **90 °C**. Short circuit **250 °C**.
 - Emergency **130 °C**, "should not exceed 1500 hours during the lifetime" and allows "20 % higher current" (manufacturer claim).
@@ -239,7 +242,7 @@ All three examples were **reproduced numerically in this session** from the veri
 - The symbol definitions are **verified** [TH-12]. The full IEC 60287-1-1 equation text was **NOT read** (it is an image on the page). The usual form is I = [(Δθ − Wd(0.5·T1 + n(T2+T3+T4))) / (R·T1 + nR(1+λ1)·T2 + nR(1+λ1+λ2)(T3+T4))]^0.5, but it is **uncertain** because it was not verified against the standard.
 - T4 is roughly proportional to soil thermal resistivity × ln(2L/De), the textbook buried-cylinder form. That is also **not verified** here. The engine should use the manufacturer correction factors below instead of solving IEC 60287.
 
-### 3.3 Derating factors. alfanar MV catalogue, Annex E [TH-10], verified (headers read from page images)
+### 3.3 [EXCLUDED per D-004] Derating factors. alfanar MV catalogue, Annex E [TH-10], verified (headers read from page images)
 Basis: air 40 °C, **ground 30 °C**, **soil 1.5 K·m/W**, **depth 0.8 m**, screens bonded both ends.
 
 - **Table E.1, ground temperature** (90 °C conductor):
@@ -409,7 +412,7 @@ Secondary reproduction [TH-17], verified from the paper. Values are maximum temp
    - Integrate V per tick: eq. (2) for Kraft paper, eq. (3) for TUP. Remaining life = budget − ΣV·dt. A budget of 180 000 h for TUP is a reasonable placeholder [TH-02 Table 3], but it should come from DECISIONS.
    - Alarm and trip bands from Table 4: 105 °C top-oil and 120 °C hot-spot (normal cyclic); 115 °C top-oil and 140 °C hot-spot (long-time emergency); current 1.5 and 1.8 p.u.; >140 °C hot-spot means bubble risk (event).
 4. **Cables**
-   - Ampacity = catalogue base × f_ground × f_soil × f_depth × f_group (alfanar basis 30 °C / 1.5 K·m/W / 0.8 m).
+   - Ampacity = catalogue base × f_ground × f_soil × f_depth × f_group (base and factors from non-employer catalogue — see 11-assets-round2; alfanar values EXCLUDED per D-004).
    - Soil dry-out could be modelled as soil resistivity rising toward 2.5 under sustained load. That is a design hypothesis, not sourced; IEC 60853-3 exists for it [TH-13].
    - Short-circuit check: I²t ≤ k²S² with k_Cu = 143 and k_Al = 94 (90 → 250 °C).
 5. **Switchgear**
