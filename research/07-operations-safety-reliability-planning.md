@@ -1,5 +1,8 @@
 # 07: Distribution operations, switching & safety, reliability, restoration, planning
 
+> **Lead note (D-004, after review R1-02):** wherever this note says "ask the owner/Ahmad", read it as **"public source needed"**. The owner may only point to a *public* document. No values from his work knowledge, type tests, supplier data, tenders or customer-internal (SEC) documents are used.
+
+
 The full bibliography is in `research/sources/07-op.md` (IDs `[OP-xx]`).
 
 Status tags on claims:
@@ -258,6 +261,8 @@ Two related points from other sources:
 ---
 
 ## 5. Planning and economics
+
+> **Superseded in part (review R1-18):** the SEC 50 %/65 % loading rule IS verified in 01 §4 (DPS 2004), and SEC automation share is 36.4 % (2024) / 39.3 % (Q3 2025) per 01 §4. Statements below that call these not found are superseded.
 
 - **N-1 for open rings / ~50 % loading: NF as a published rule.** It follows from simple arithmetic: if either feeder must carry the whole ring after the NOP closes, each half should normally run at or below about 50 % of the ring's emergency rating. Treat this as **derived, not cited**. The SEC Distribution Planning Standard (March 2004) exists, but no loading clauses were seen (S [OP-38]). Get the actual SEC/DPS value from the owner.
 - **UK security standard.** EREC P2 is the UK reference for restoration times by demand class [OP-19] (V; details in §2.2).

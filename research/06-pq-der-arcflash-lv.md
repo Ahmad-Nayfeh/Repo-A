@@ -1,5 +1,8 @@
 # 06 — Power quality, transients, DER & frequency balancing, arc flash, LV/home side
 
+> **Lead note (D-004, after review R1-02):** wherever this note says "ask the owner/Ahmad", read it as **"public source needed"**. The owner may only point to a *public* document. No values from his work knowledge, type tests, supplier data, tenders or customer-internal (SEC) documents are used.
+
+
 Research notes for the game model. Every number carries a source ID from `research/sources/06-pq.md` and a status:
 **verified** (I read the page/PDF), **verified (secondary)** (I read a utility/vendor/press summary, not the standard or report itself), **snippet-only** (I saw it only in a search-result snippet), **uncertain/conflicting**, **NOT FOUND**.
 

@@ -1,5 +1,8 @@
 # 02 — Fault physics, short-circuit calculation, earthing, fault location (MV distribution)
 
+> **Lead note (D-004, after review R1-02):** wherever this note says "ask the owner/Ahmad", read it as **"public source needed"**. The owner may only point to a *public* document. No values from his work knowledge, type tests, supplier data, tenders or customer-internal (SEC) documents are used.
+
+
 Research notes for the game engine. Source list: `research/sources/02-sc.md` (IDs `[SC-xx]`).
 Status tags on each claim: **verified** (I read it in the source), **snippet-only** (search snippet only), **uncertain** (sources conflict / edition unclear), **NOT FOUND**.
 All arithmetic marked "recomputed" was re-done by me in Python from the published inputs (not a new source).

@@ -1,5 +1,8 @@
 # 03 — Protection relays, time-current characteristics, coordination, protection problems
 
+> **Lead note (D-004, after review R1-02):** wherever this note says "ask the owner/Ahmad", read it as **"public source needed"**. The owner may only point to a *public* document. No values from his work knowledge, type tests, supplier data, tenders or customer-internal (SEC) documents are used.
+
+
 Research notes for the engine's protection model. Source IDs [PR-xx] → `research/sources/03-pr.md`.
 Status tags per claim: **verified** (read in fetched doc), **snippet-only**, **uncertain/conflicting**, **derived** (computed by us from verified formulae — not a published number), **NOT FOUND**.
 

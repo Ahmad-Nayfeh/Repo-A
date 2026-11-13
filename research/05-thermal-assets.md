@@ -230,7 +230,7 @@ All three examples were **reproduced numerically in this session** from the veri
 > **D-004 notice (lead, after round 2):** every item below citing [TH-10] comes from an alfanar catalogue (the owner's employer). Per D-004 these values are **EXCLUDED from the game model** and kept only as historical research trail. Replacements: Saudi Cable Company catalogue and other non-employer sources in `11-assets-round2.md`. The "130 °C emergency / 1500 h" rule has no non-employer source; the model uses the AEIC/ICEA 105 °C emergency limit instead (see 11).
 
 
-### 3.1 Temperatures (XLPE), verified [TH-10]
+### 3.1 Temperatures (XLPE) [TH-10 EXCLUDED per D-004 as source; 90/250 °C values are standard XLPE limits also given by non-employer sources in 11]
 - Continuous conductor temperature **90 °C**. Short circuit **250 °C**.
 - Emergency **130 °C**, "should not exceed 1500 hours during the lifetime" and allows "20 % higher current" (manufacturer claim).
 - XLPE thermal resistivity 3.5 K·m/W.
@@ -287,7 +287,7 @@ Basis: air 40 °C, **ground 30 °C**, **soil 1.5 K·m/W**, **depth 0.8 m**, scre
 
   The constants are **verified** [TH-11]; the source cites IEC 60364-5-54 and IEC 60949.
 - XLPE 90 → 250 °C (derived): **k_Cu = 143.1** and **k_Al = 94.5**. TH-11 states k = 143 for Cu thermosetting 90 °C.
-- Cross-check against alfanar Annex F (IEC 60949, adiabatic, 90 → 250 °C) [TH-10], **verified**: Cu 240 mm², 1 s → 34.3 kA (k = 142.9); Al 240 mm², 1 s → 22.7 kA (k = 94.6). The scaling rule is I_t = I_1s/√t.
+- [EXCLUDED per D-004 — use SCC/NKT, see 11 & 10] Cross-check against alfanar Annex F (IEC 60949, adiabatic, 90 → 250 °C) [TH-10], **verified**: Cu 240 mm², 1 s → 34.3 kA (k = 142.9); Al 240 mm², 1 s → 22.7 kA (k = 94.6). The scaling rule is I_t = I_1s/√t.
 - Example rows (kA, 1 s / 3 s):
   - Cu 95 mm²: 13.6 / 7.8
   - Cu 240 mm²: 34.3 / 19.8
@@ -386,14 +386,14 @@ Secondary reproduction [TH-17], verified from the paper. Values are maximum temp
 - Indirect, verified hints usable by the design:
   - IEC distribution transformer functional life is 180 000 h (20.55 y) at 110 °C for upgraded paper [TH-02 Table 3]
   - RM6 expected SF6 tightness lifetime is 30 years [TH-18]
-  - XLPE emergency operation at 130 °C is allowed for ≤1500 h per lifetime [TH-10]
+  - [EXCLUDED per D-004] XLPE emergency operation at 130 °C … [TH-10] — model uses AEIC/ICEA 105 °C (11)
 
 ## 7. Hot climate (Gulf / Riyadh)
 - Peer-reviewed Saudi or Gulf field studies: **NOT FOUND**.
 - What the verified standards and catalogues already imply:
   - IEC 60076-7 design ambients are 20 °C (yearly weighted) and 30 °C (hottest month) [TH-02 §8.3, TH-06]. Wind and sunshine are acknowledged but "impracticable to take into account" [TH-02 §7.2.4].
   - Kiosks add 10 to 20 K to ambient for one 250 to 750 kVA unit [TH-02 Table 6].
-  - Cable ratings degrade 5 % per 5 K of ground temperature above 30 °C, and to 0.80 at 2.5 K·m/W soil [TH-10].
+  - [EXCLUDED per D-004 — use SCC factors in 11] Cable ratings degrade 5 % per 5 K of ground temperature above 30 °C, and to 0.80 at 2.5 K·m/W soil [TH-10].
   - RMU current falls to 515 A at 50 °C and 425 A at 60 °C for a 630 A unit [TH-18]. Enclosures must keep the RMU ambient ≤60 °C [TH-19].
 - Solar-radiation heating of kiosks, dust on insulation, cooling issues: **NOT FOUND** in fetched sources.
 
@@ -427,7 +427,7 @@ Secondary reproduction [TH-17], verified from the paper. Values are maximum temp
 - **GT-3** IEC Annex E OF overload: θh(30 min) = 114.2 °C, loss of life 0.14 day, maximum rise 94 K.
 - **GT-4** Derived distribution steady state: 98 °C at K = 1, θa = 20 °C, so V = 1.
 - **Ageing table:** IEC Table 2 values (V(110) = 4.0 for Kraft; V(98) = 0.282 for TUP).
-- **Cable k-factor:** Cu 240 mm² 1 s → 34.3 kA; Al 240 mm² 1 s → 22.7 kA [TH-10].
+- **Cable k-factor:** [EXCLUDED per D-004] TH-10 values; use SCC p. 82 (I = 0.143·S kA Cu, 0.0937·S kA Al, 1 s) [AS2-13] and NKT 3×240 Al 22.7 kA [SP2].
 
 ## Open questions
 1. IEC 60076-7:2018 numeric tables (2018 Table 2 limits, Table 3 current limits, Table 4 thermal characteristics, Annex H and I examples). Did the distribution-transformer short-time emergency limits change, as Alliander's 115/160 °C suggests? This needs a purchased or library copy.

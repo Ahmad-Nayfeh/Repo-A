@@ -1,5 +1,8 @@
 # 01: KSA / Gulf power-system context for a Riyadh-area distribution model
 
+> **Lead note (D-004, after review R1-02):** wherever this note says "ask the owner/Ahmad", read it as **"public source needed"**. The owner may only point to a *public* document. No values from his work knowledge, type tests, supplier data, tenders or customer-internal (SEC) documents are used.
+
+
 Research date: 2026-11-13. Source IDs `[KSA-nn]` resolve in `research/sources/01-ksa.md`.
 Status tags: **verified** means I read the primary text. **snippet-only** means I saw only a search snippet. **uncertain/conflicting** means sources disagree or the attribution is unclear.
 

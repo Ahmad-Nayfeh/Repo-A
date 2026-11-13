@@ -40,3 +40,18 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 ## D-007 — Ten departments as gates (2026-11-13)
 - See docs/org/README.md for the list and rationale. Merged Performance into Engineering (physics cost negligible per PF benchmark); added Safety & Integrity (operational content risk); omitted marketing/community (no server).
 - Departments run as CI checks + fresh-context review subagents. Reversible: yes.
+
+## D-004a — Employer rule extended (2026-11-13, after review R1-02)
+- No values from the owner's work knowledge, type-test reports, supplier data/TCCs, tenders, or customer-internal (SEC) documents. Only publicly posted documents (e.g., SEC specifications published on se.com.sa) are allowed. NEEDS-AHMAD must never ask for data.
+
+## D-005 (revised, after review R1-05/R1-06) — Golden-test data
+- Supersedes D-005 (c). Committed golden tests use: (1) textbook/vendor worked examples (published numbers, cited); (2) **our own authored feeders**, cross-checked offline with pandapower *code* (BSD-3) on *our* data — these are the primary power-flow golden tests; (3) the 33-bus case only via a **test-time fetch** of MATPOWER `case33bw.m` from its public repository (never committed); expected values labelled [D]+[S]. The 1989 paper is not re-typed (not read; known inconsistency).
+
+## D-008 — Scoring keeps safety separate from performance (2026-11-13, after review R1-03)
+- Re-energisation guards (delay, staff exclusion, duty limit, risk-assessment step) are hard gates in Night Shift; a separate safety & asset record is shown and cannot be traded for CML. Any recorded violation removes stars.
+
+## D-009 — Transformer thermal parameters from SEC 51-SDMS-04 Rev.02 (2026-11-13, after review R1-10)
+- Δθor 45 K, hot-spot 98 °C at rating with 35 °C design temperature ⇒ Δθhr 18 K [D]; R from SEC max-loss table; IEC 60076-7:2005 exponents and time constants. Validated against the SEC emergency-loading table as a one-sided check. Alternatives rejected: IEC normal-ambient defaults (would predict ~76× ageing on Riyadh afternoons — not representative of SEC units).
+
+## D-010 — Versioned seeds and links (2026-11-13, after review R1-15)
+- Every seed/share/replay carries `v=<engine+data version>`; a model changelog maps changes to source IDs; old links show a notice when replayed on a newer engine.
