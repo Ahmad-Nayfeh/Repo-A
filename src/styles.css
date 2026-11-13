@@ -184,3 +184,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .fault-key { color: var(--off); }
 @media (max-width: 600px) { .tcc .axis { font-size: 16px; } }
 @media (max-width: 600px) { .tcc .axis { font-size: 20px; } .tcc .fault-label { font-size: 22px; } .grading .board { gap: 8px; } }
+.grading .hud { position: sticky; top: 0; z-index: 5; }
+.failcount { text-decoration: none; color: inherit; }
+@media (max-width: 600px) { .grading .hud-actions { width: auto; } .grading .hud { gap: 4px 12px; padding: 6px 10px; } .grading .hud .stat b { font-size: 1rem; } .tcc .axis { font-size: 22px; } }
+@media (max-width: 600px) {
+  .grading .hud { flex-wrap: nowrap; overflow-x: auto; }
+  .grading .hud .stat span { font-size: 0.65rem; max-width: 7.5em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .grading .hud-actions button { padding: 4px 8px; font-size: 0.8rem; }
+}

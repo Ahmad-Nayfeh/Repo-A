@@ -220,3 +220,48 @@ Bottom-up per-relay minimisation does not minimise the total; a player can beat 
 - The AR layout is RTL with no horizontal scroll at 390 px. Touch targets are at least 44 px.
 - The fault-current numbers are bidi-isolated in the legend and table.
 - The loop is engaging on desktop: the TCC plot and the per-relay load hints make the trade-off visible, and the starting settings fail on the incomer margin, which gives a clear first goal.
+
+## Re-verification
+
+Checked against commit `fafa8f7` (D-018). Method:
+- Engine probe over seeds 1–60.
+- Unit tests: 3/3 pass.
+- Playwright, desktop EN (seed 7) and phone AR (seed 42).
+- Screenshots: `rv-*.png` in the same scratchpad folder.
+
+- **GR-01: resolved.**
+  - New `tee-max` case (feeder vs tee-off) and `near-max` case (incomer vs feeder at busbar current).
+  - The reference grading's smallest margins over 60 seeds are now 0.3001 s and 0.3007 s (they were 0.000 s and 0.002 s).
+  - All 60 reference gradings pass, and none is missing.
+- **GR-02: resolved.**
+  - LV-terminal faults are no longer scored.
+  - The tee-off must take between 0.4 s and 2 s at LV-max. The reference gives 0.40–0.46 s.
+  - The 0.4 s value is labelled [A].
+- **GR-03: resolved.**
+  - New `hsReach` rule: the high-set must be at least 1.3 × LV-max.
+  - The overreaching high-set from the original review now fails on 60/60 seeds.
+  - The reference now uses a high-set on 26/60 seeds.
+- **GR-04: resolved.**
+  - The LV minimum is now an LV earth fault, taken as 1/√3 of the three-phase value through Dyn11, at half the source fault level.
+  - This is an approximation that treats the LV earth fault as about equal to the three-phase fault. It is labelled [D]; acceptable.
+- **GR-05: resolved.**
+  - Typing "0.1" into TMS now gives 0.1.
+  - Clearing pickup and typing 400 now gives 400.
+  - An empty high-set field reverts instead of becoming 0 A.
+  - A delay of −1 is clamped to 0.05.
+- **GR-06: partial rejection accepted.**
+  - Backup within 2 s is now enforced for MV faults.
+  - For LV faults the physical reason holds. On 500 kVA, LV-max is 427–445 A against a feeder pickup of at least 300 A. The LV-min earth fault (about 220 A) is below the feeder pickup, so the feeder relay cannot see it.
+  - Feeder backup at LV-max is feasible on some 1000/1500 kVA seeds (0.9–1.7 s) but not on all of them (up to 6.3 s, or no trip).
+  - The limitation is stated honestly in `grNote` in both languages.
+  - Optional: show the feeder backup time at LV-max as information only.
+- **GR-07: not resolved (Important, carried over).**
+  - The phone page is 3,644 px tall, with no sticky status and no `aria-live`.
+  - TCC axis labels are still about 6–7 px.
+  - New minor issue: the busbar legend row has no ④ marker on the chart.
+- **GR-08: resolved.**
+  - The Arabic incomer is now قاطع الوارد.
+  - The reference grading is a bidi-correct list ("189 A · TMS 0.15").
+  - Minor leftovers: Latin "A" instead of أ, and a doubled "· ·" in the feeder line.
+
+**Verdict: pass-after-fixes.** The engineering items GR-01 to GR-06 are closed. Before release, fix GR-07: give the phone a sticky per-relay status line and a readable chart font.
