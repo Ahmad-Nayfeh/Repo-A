@@ -49,8 +49,8 @@ export interface Scenario {
   staleFpis: string[];      // FPI ids that will not reset (show old flags)
 }
 
-export function generateScenario(seed: number, difficulty: Difficulty): Scenario {
-  const spec = DIFFICULTY[difficulty];
+export function generateScenario(seed: number, difficulty: Difficulty, overrides: Partial<DifficultySpec> = {}): Scenario {
+  const spec: DifficultySpec = { ...DIFFICULTY[difficulty], ...overrides };
   const rng = Rng.stream(seed, 'district');
   const net: Network = { buses: [], sources: [], cableTypes: [CABLE_3x300AL], cables: [], switches: [], transformerTypes: TRAFOS, transformers: [], loads: [], fpis: [], relays: [], fMainsHz: SYSTEM.fHz.value };
   const kv = SYSTEM.mvKV.value;

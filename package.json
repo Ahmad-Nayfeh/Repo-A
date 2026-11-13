@@ -26,6 +26,7 @@
     "vitest": "^3.2.7"
   },
   "dependencies": {
+    "@fontsource/noto-sans-arabic": "^5.3.0",
     "@preact/signals": "^2.11.4",
     "preact": "^10.29.8"
   }

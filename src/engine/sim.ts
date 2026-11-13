@@ -616,7 +616,7 @@ export class Simulation {
     const unproven = newly.filter((c) => !this.provenHealthy(c));
     if (unproven.length > 0) {
       if (this.damageReported && !this.damageAttended && unproven.includes(this.scenario.fault.cable)) return fail('damageBlock');
-      if (just === undefined) return fail('needChecklist', { cables: unproven.length });
+      if (just === undefined) return { ok: false, reason: 'needChecklist', reasonData: { cables: unproven.length } }; // a request, not a near miss
       if (just === 'delay' && this.tripT !== null && this.t < this.tripT + this.reenergiseDelayMs()) return fail('delayNotElapsed', { leftMin: Math.ceil((this.tripT + this.reenergiseDelayMs() - this.t) / MIN) });
       if (just === 'evidence') return fail('evidenceInsufficient');
       // crews must be clear of substations on this circuit, except the operating crew [OP-05 §13.15]
@@ -629,6 +629,21 @@ export class Simulation {
       if (s.faultMakeLeft <= 0) return fail('dutyExhausted');
     }
     return { ok: true };
+  }
+
+  /** Side-effect-free preview of what the pre-switching checklist will check (for the UI). */
+  closePreview(switchId: string, crew: number | null): { unproven: number; delayLeftMin: number; crewsInside: { crew: number; site: string }[]; damage: boolean; dutyLeft: number } {
+    const s = this.swById.get(switchId)!;
+    s.closed = true;
+    const topo = buildTopology(this.net);
+    s.closed = false;
+    const live = (bus: string) => { const n = topo.nodeOf.get(bus)!; return topo.islands[topo.islandOf.get(n)!]!.energised; };
+    const unproven = this.net.cables.filter((c) => !this.cableEnergised(c.id) && (live(c.from) || live(c.to)) && !this.provenHealthy(c.id)).map((c) => c.id);
+    const delayLeftMin = this.tripT === null ? 0 : Math.max(0, Math.ceil((this.tripT + this.reenergiseDelayMs() - this.t) / MIN));
+    const ringIds = new Set(unproven.map((c) => this.scenario.rings.find((r) => r.cables.includes(c))!.id));
+    const crewsInside = this.crews.filter((c) => c.id !== crew && c.site && ringIds.has(this.scenario.sites.find((x) => x.id === c.site)!.ring ?? '')).map((c) => ({ crew: c.id, site: c.site! }));
+    const damage = this.damageReported && !this.damageAttended && unproven.includes(this.scenario.fault.cable);
+    return { unproven: unproven.length, delayLeftMin, crewsInside, damage, dutyLeft: s.faultMakeLeft };
   }
 
   private cableSideBus(s: Switch): string {
