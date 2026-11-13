@@ -17,3 +17,9 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 - Evidence: repo has a single branch `claude/new-session-k41b2n` (no `main`). Enabling GitHub Pages (Source = GitHub Actions) is a repository setting this session cannot change through its tools.
 - Decision: build a Pages workflow that deploys on push; create `main` via PR when the first playable build passes gates; document the one-time Pages settings click in NEEDS-AHMAD.
 - Reversible: yes.
+
+## D-004 — No employer-sourced data in the model, even if public (2026-11-13)
+- Context: Research round 1 (topic 05) cited the alfanar public MV cable catalogue. alfanar is the owner's employer; the brief forbids anything from any employer.
+- Decision: alfanar documents may remain in research notes only as a flagged cross-check; the game model must take every value from non-employer sources (NKT, Nexans, Top Cable, Eland, Schneider, ABB, standards). Round 2 must supply replacements.
+- Alternatives: use it since it is public (rejected — rule 5 is about avoiding any appearance of using employer material).
+- Reversible: yes.
