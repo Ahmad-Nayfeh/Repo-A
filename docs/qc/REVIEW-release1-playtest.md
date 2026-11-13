@@ -185,3 +185,49 @@ The reference bot's sequences vary from seed to seed, so it is not one recipe. E
 ## Verdict
 
 **Fail** for release in the current state, because of G-01 (the advertised replay and share feature gives wrong results) and G-02 (no keyboard completion). It becomes **pass-after-fixes** once G-01 to G-10 are fixed. G-11 to G-16 should be fixed before the game is presented to Saudi engineers as "realistic". The core loop is sound and enjoyable, and the safety gating teaches the right habits.
+
+## Re-verification
+
+Build: HEAD 8532c59, including 9636dfd "Release review 2 (playtest) fixes". Rebuilt and re-played through the UI at 1440 EN and 390 AR (touch). New screenshots: `PT/v-*.png`.
+
+**G-01 to G-10:**
+- **G-01: resolved.** Training 1 played through the UI, and normal seed 777 in AR, each give identical metrics when the replay URL is opened.
+- **G-02: resolved.** RMUs, cables and grid stations A and B are now in the Tab order. I selected GS B and closed R1-CBB using only the keyboard.
+- **G-03: resolved.** Hard 4242 shows "365 off" and the re-trip in the log immediately after the close.
+- **G-04: resolved in code.** `msg()` now adds 1 to the crew number. The toast is now hard to trigger, because the checklist disables Confirm and local crew closes onto unproven sections are blocked.
+- **G-05: resolved.**
+  - Confirm is disabled while any item shows ❌, with an explanation.
+  - Focus moves to Cancel and stays inside the dialog.
+  - Esc closes it.
+  - Minor leftover: requesting a permit before the earths finish still counts as a near miss (training run showed 4).
+- **G-06: mostly resolved.**
+  - The stage hints now cover permit, repair and return-to-normal, and they no longer go backwards.
+  - Two leftovers: `tr1_4` still says "(the checklist appears)", which does not happen in training 1; and no hint says "click an RMU".
+- **G-07: resolved.** An Advance with nothing pending now moves 30 minutes.
+- **G-08: resolved.** The cable panel shows "✅ Repaired and tested" and no "Start repair" button.
+- **G-09: resolved.** The map and panel show ○ for "read, not flagged", with the read time and the flag time.
+- **G-10: resolved.** The header is no longer sticky on phones, and the RMU title and tabs are visible after a tap (`PT/v-22-ar-site-panel.png`).
+
+**Spot checks in Arabic at 390 px:**
+- **G-14: resolved.** The sequence is lock, then "test for absence of voltage", then earth when the crew finishes. A permit is refused until the earths are on.
+- **G-15: resolved.** Template digits now follow the Western-digit setting ("13.8", "انتظر 5 دقائق", "125٪").
+- **G-16: resolved in results and share.**
+  - Results now say "73 دقيقة" and "7 عمليات تحويل". The share text is multi-line and uses `dir=auto`.
+  - Leftover: the About page links and the engine version line are still English.
+- **G-17: partly resolved.**
+  - Fixed: أقفِل and مُفعَّل.
+  - Unchanged: "الفرقة 1: ابتعد عن المحطة" (wrong gender) and "كان العطل طور واحد إلى الأرض".
+- **G-18: resolved.** IDs are wrapped in `<bdi>` with a "·" separator.
+- **G-19: mostly resolved.** Targets are 44 px. The checkboxes themselves are still 13–22 px but sit inside labels, and ☰ is 38 px wide.
+
+**New regression (Important): the log shows raw values in both languages.**
+- What the log shows:
+  - "Lock/tag true at R1-5-R", "Earth true".
+  - "R1-3-R open" and "R1-CBB close" instead of opened/closed.
+  - In Arabic, "القفل/البطاقة true", "R1-CBB close".
+  - The task name appears raw: "أنهت الفرقة 1 proveDead".
+- Cause: `LogPanel.fmtData` in `src/ui/Game.tsx` has a new `if (k === 'on' && 'cable' in d)` without a leading `else`. The rest of the `else` chain then overwrites the `op` and `on` values with the raw ones.
+- Fix: change it to `else if`, and add a translation for the `proveDead` task.
+- Screenshot: `PT/v-26-ar-log.png`.
+
+**Verdict: pass-after-fixes.** G-01 to G-10 are resolved; G-06 has minor leftovers. Fix the log-formatter regression, then release.

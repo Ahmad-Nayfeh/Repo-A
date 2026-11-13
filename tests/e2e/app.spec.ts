@@ -77,3 +77,19 @@ test('keyboard: RMUs are reachable by Tab and selectable with Enter; switch list
   await page.getByText('Switching points').click();
   await expect(page.locator('.switch-list').getByRole('button', { name: 'R1-CBA' })).toBeVisible();
 });
+
+test('log shows translated entries, never raw engine values (G re-verification regression)', async ({ page }) => {
+  for (const lang of ['en', 'ar'] as const) {
+    await page.goto('/#/');
+    await page.evaluate((l) => localStorage.setItem('gs.lang', l), lang);
+    await page.reload();
+    await page.goto('/#/play?v=1&s=777&d=easy');
+    await page.waitForFunction(() => !!(window as any).__gs?.session());
+    await page.evaluate(() => { const g = (window as any).__gs; const s = g.session(); for (const a of g.botActions(777, 'easy').slice(1)) s.apply(a); });
+    await page.locator('.results .btns button').nth(1).click(); // back to the network
+    await page.locator('.tabs button').nth(3).click();          // Log tab
+    const text = await page.locator('.log').innerText();
+    expect(text.length).toBeGreaterThan(50);
+    for (const raw of [' true', ' false', 'proveDead', 'readFpi', 'attendDamage', ' close\n', ' open\n']) expect(text).not.toContain(raw);
+  }
+});

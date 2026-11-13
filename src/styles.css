@@ -157,3 +157,6 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   .panel { scroll-margin-top: 8px; }
 }
 .net .hit { fill: transparent; }
+.eng input, .row input[type=checkbox] { width: 22px; height: 22px; }
+.eng { min-height: 44px; }
+.hud .ghost { min-width: 44px; font-size: 1.3rem; }

@@ -235,7 +235,7 @@ function CrewPanel({ s, run }: { s: GameSession; run: (a: Action) => void }) {
         const eta = clock(sim.hourOfDay(c.busyUntil));
         let st = c.site ? t('crewAt', { site: c.site }) : c.task === 'clear' ? t('crewClear') : t('crewBase');
         if (c.travellingTo) st = t('crewTravel', { site: c.travellingTo, eta });
-        else if (c.busyUntil > sim.t) st = t('crewBusy', { task: c.task ?? '', eta });
+        else if (c.busyUntil > sim.t) st = t('crewBusy', { task: t(`task_${c.task ?? 'operate'}`), eta });
         return <li key={c.id}>🚚 <b>{t('crew', { n: c.id + 1 })}</b> — {st}</li>;
       })}
     </ul>
@@ -271,8 +271,8 @@ function LogPanel({ s }: { s: GameSession }) {
     const out: Record<string, string | number> = {};
     for (const [k, v] of Object.entries(d)) {
       if (k === 'op') out[k] = v === 'open' ? t('opened') : t('closedV');
-      else if (k === 'on') out[k] = v ? t('on') : t('off');
-      if (k === 'on' && 'cable' in d) out[k] = v ? t('issued') : t('cancelled');
+      else if (k === 'on') out[k] = 'cable' in d ? (v ? t('issued') : t('cancelled')) : (v ? t('on') : t('off'));
+      else if (k === 'task') out[k] = t(`task_${v}`);
       else if (k === 'crew') out[k] = Number(v) + 1;
       else if (k === 'reason') out[k] = t(`blk_${v}`) !== `blk_${v}` ? t(`blk_${v}`, {}) : String(v);
       else if (k === 'element') out[k] = v === 'phase' ? t('elementPhase') : t('elementEarth');
