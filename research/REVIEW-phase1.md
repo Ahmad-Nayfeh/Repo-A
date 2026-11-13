@@ -329,3 +329,27 @@ Required before Phase 1 exit:
 - R1-07, R1-08, R1-09 and R1-10 (earthing, PQ scope, hot-ambient transformer model).
 
 The remaining Important items (R1-11 to R1-17) can be tracked as Phase 2 design inputs. The Minor items are housekeeping.
+
+---
+
+## E. Re-verification (2026-11-13, after lead fixes; scope R1-01..R1-10 only)
+
+Read: SYNTHESIS v3 (incl. §9), 05-thermal-assets.md, sources/05-th.md, SOURCES.md, 12-sec-distribution-transformer-spec.md, DECISIONS (D-004a, D-005 revised, D-008..D-010), banners in 01/02/03/06/07. Spot-checked SEC 51-SDMS-04 Rev.02 PDF (downloaded, pdftotext).
+
+- **R1-01 — resolved.** The SYNTHESIS cable row now cites SCC p. 82 and NKT. 05 lines 233, 290, 298, 389, 396 and 430 are marked EXCLUDED. TH-10 is flagged in sources/05-th.md and SOURCES.md, and the k cross-check is re-pointed to IEC 60949, SCC and NKT.
+- **R1-02 — resolved, with residual cleanup recommended (Minor).**
+  - D-004a covers work knowledge, type tests, supplier TCCs, tenders and SEC-internal documents, and the D-004 banner is on 01/02/03/06/07.
+  - The original sentences still read literally as requests: 03 OQ4 "owner's supplier data", 06 OQ2 "type-test report of the MRMU/RMU products", 06 l.540 "owner-supplied reference point", 06 l.538/549 UFLS from the owner.
+  - The banner overrides them, but they should be struck through so nobody acts on them.
+- **R1-03 — resolved.** Hard gates plus a separate non-tradeable safety/asset record (SYNTHESIS rank 1, D-008), including a risk-assessment step.
+- **R1-04 — resolved.** Both columns are recorded (RDC20 0.100 and "RAC" 0.130); 0.100 is used for max fault and 0.130 for losses/min fault, and the interpretation is labelled [D].
+- **R1-05 — resolved.** The 33-bus value is relabelled [D] + [S], with the paper inconsistency stated.
+- **R1-06 — resolved.** Revised D-005: authored feeders are the primary tests, MATPOWER is fetched at test time, the paper is not re-typed, and the pandapower data caveat is stated. The old D-005 (c) text still stands in the file but is marked superseded by the revision.
+- **R1-07 — resolved.** Screen I²t check (NKT 7.0 kA vs 22.7 kA) added to the §3 table and Engine v1.
+- **R1-08 — resolved.** The low-resistance default is labelled [A], the "Solidly" counter-evidence is shown, and both settings are tested.
+- **R1-09 — resolved.** Transmission scope (cl. 2.4.6.2) is stated, and MV/LV flicker and unbalance values are listed.
+- **R1-10 — resolved.** SEC 51-SDMS-04 Rev.02 parameters are adopted (D-009).
+  - Spot-check confirmed in the PDF: §5.2.1(c) "Design Temperature of 35°C (based on yearly average temperature)", (e) hot-spot 98 °C; §5.2.7 Dyn11; §5.2.8 impedance 4 % / 5 % / 6 %; §5.2.9 rises 45 K top-oil / 50 K winding; Table 4 133 % for 240 / 155 min with hot-spot ≤ 140 °C; 55 °C ambient clause.
+  - Note: the spec words (d) as "Temperature-Rise Limits Above 50°C and 45°C Ambient", which is garbled. So the Δθhr = 18 K derivation (98 − 35 − 45) depends on how the rises are referenced. It is correctly labelled [D] and should stay a stated assumption.
+
+**Re-verification verdict: PASS** (all required findings R1-01..R1-10 resolved; one Minor residual cleanup under R1-02).

@@ -31,9 +31,9 @@ For each phenomenon: **what** is modelled · **method** · **simplified (and why
 ## F4. Thermal & ageing
 
 - **What:** distribution transformer top-oil and hot-spot temperatures, ageing rate and loss of life; cable loading vs derated ampacity; cable and switchgear short-time (I²t) withstand.
-- **Method:** IEC 60076-7 difference equations (C.6–C.11 in 2005 edition, via IS 2026-7) with ONAN distribution parameters x 0.8, y 1.6, R 5, Δθor 55 K, Δθhr 23 K, τo 180 min, τw 4 min, k11 1, k21 1, k22 2 [TH-02]; kiosk ambient correction per Table 6 [TH-02]; ageing V = 2^((θh−98)/6) (Kraft) or the TUP formula [TH-02]; Δt ≤ 2 min sub-stepping. Cable steady ampacity = base × ground-temperature × soil-resistivity × depth × grouping factors from the Saudi Cable Company catalogue [AS2] (base ratings from SEC DPS where available [KSA-02]); adiabatic check I²t ≤ k²S², k_Cu 143, k_Al 94 [TH]; switchgear rated current derated with ambient using a published vendor table [TH] and short-time rating 21 kA 1 s [KSA-07].
+- **Method:** IEC 60076-7:2005 difference equations (C.6–C.11, via IS 2026-7; the 2018 edition was not read) with exponents/time constants x 0.8, y 1.6, τo 180 min, τw 4 min, k11 1, k21 1, k22 2 [TH-02] and **SEC parameters** Δθor 45 K, Δθhr 18 K [D from hot-spot 98 °C at 35 °C design temperature], R by size from SEC max losses (6.2 / 6.3 / 8.2 / 8.2 for 300/500/1000/1500 kVA) [T12-01] (D-009); kiosk ambient correction per Table 6 [TH-02]; ageing V = 2^((θh−98)/6) (Kraft) or the TUP formula [TH-02]; Δt ≤ 2 min sub-stepping. Cable steady ampacity = base × ground-temperature × soil-resistivity × depth × grouping factors from the Saudi Cable Company catalogue [AS2-13] (base ratings from SEC DPS: 300 A at 35 °C/2.0 K·m/W/1.0 m [KSA-02]); adiabatic checks I²t ≤ k²S² for **conductor** (k_Cu 143, k_Al 94 [TH-11]) and **metallic screen** (screen 1-s rating from NKT datasheet, e.g. 7.0 kA for 3×240/50 [SP2]) — screen overheating on solid-earthed SLG faults is a damage event; switchgear rated current derated with ambient using a published vendor table [TH] and short-time rating 21 kA 1 s [KSA-07].
 - **Simplified:** no cable thermal dynamics (steady rating only — time constants NOT FOUND); no soil dry-out; transformer parameters generic ONAN, not SEC type-test data; solar gain on kiosks not modelled beyond Table 6 correction.
-- **Validation:** IEC 60076-7 Annex C 41-step example (±0.15 K, loss of life 6.15 days ±1 %); Annex E (θh 114.2 °C ±0.2 K); steady state at K = 1, θa = 20 °C ⇒ θh = 98 °C, V = 1 (exact); ageing table points (V(110) = 4.0).
+- **Validation:** method — IEC 60076-7 Annex C 41-step example (±0.15 K, loss of life 6.15 days ±1 %) and Annex E (θh 114.2 °C ±0.2 K) run with *their* parameters; ageing table points (V(110) = 4.0); Saudi parameters — steady state at K = 1, θa = 35 °C ⇒ θh = 98 °C, V = 1 (exact by construction); **SEC emergency-loading check** (one-sided): from equilibrium at 75 % load, 133 % keeps θh ≤ 140 °C for ≥ 240 min at 30 °C and ≥ 155 min at 40 °C; 150 % for ≥ 98 / 65 min [T12-d]; SCC↔DPS cable rating consistency 293 vs 300 A [D].
 
 ## F5. Loads
 
@@ -46,6 +46,9 @@ For each phenomenon: **what** is modelled · **method** · **simplified (and why
 
 - **What:** remote (SCADA) vs manual switching, crew dispatch & travel, re-energisation delays, staff exclusion, switchgear fault-make duty, earthing of isolated sections, switching log.
 - **Method:** event-driven; remote-controlled switches operate in < 1 min [OP-04]; manual operations need a crew on site. Fault-switching rules follow documented UK DNO practice (SSEN): halve by customer count, reclose from original source, backfeed via NOP after capacity check, re-energisation delay 5 min at night / 20 min by day unless FPI/automation evidence [OP-05/06]; auto-reclose disabled on cable feeders [OP-05, SP2].
+- **Hard safety gates (D-008):** any re-energisation of a section that may contain the fault requires (1) the rule-set delay elapsed or positive evidence (FPI/automation) that it is healthy, (2) all crews clear of that circuit's substations, (3) switchgear fault-make duty remaining, (4) an explicit risk-assessment confirmation step. The UK 5 min (22:00–06:00) / 20 min (06:00–22:00) windows are the default **"UK DNO example rule-set"** [OP-06]; the windows are parameters and are not presented as Saudi practice.
+- **FPI type per RMU:** earth-fault-only (SEC DPS 2004: RMUs "equipped with earth fault indicator" [V per review]) or three-phase; earth-only indicators give no indication for phase-to-phase faults and are never trusted for negative indication [OP-05 §11.3].
+- **Backfeed checks:** power flow gives loading and **voltage drop** on the backfed ring; DPS allocates 1.5 % to the MV primary feeder and the utilisation limit is −7.5 % [KSA-02]; cold-load pickup multiplier on re-energised load **[A]** (magnitude not sourced).
 - **Simplified / assumptions [A]:** crew travel time = route distance / speed (night 40 km/h, day 25 km/h) + dispatch 10 min; manual RMU operation 5 min on site; repair of a cable fault 4–8 h (seeded). **No public Riyadh data was found for any of these** [OP §4]; all shown as assumptions and adjustable.
 - **Validation:** rule tests (cannot re-energise before delay without evidence; cannot close onto an earthed section — interlock; cannot operate the faulted section's switches while staff not excluded…).
 
@@ -64,14 +67,14 @@ For each phenomenon: **what** is modelled · **method** · **simplified (and why
 | Ring | open loop between two grid stations, NOP at an RMU; ≤ 50 % loading; ≤ 7.5 km to NOP | [V] DPS 2004 |
 | Grid station | 132/13.8 kV, 3 × 67 MVA | [S] (132/13.8 well attested; 67 MVA snippet) |
 | 13.8 kV fault level | equipment 21 kA 1 s; planning cap 20 kA | [V] |
-| Cable | 3×300 Al XLPE 300 A; R 0.130, X 0.108 Ω/km (60 Hz) | [V] DPS 2004 |
-| Substation | package unit 500/1000/1500 kVA, 13.8/0.4 kV Dyn11, Z per IEC 60076-5 minimum (4 %/5 %/6 %) | [V] KSA-06, PF-36 |
+| Cable | 3×300 Al XLPE 300 A (35 °C, 2.0 K·m/W, 1.0 m); R_DC20 0.100 (max fault), R 0.130 (operating; losses, min fault), X 0.108 Ω/km (60 Hz) | [V] DPS 2004 table; column interpretation [D] |
+| Substation | package unit 500/1000/1500 kVA, 13.8/0.4 kV Dyn11, Z 5 % (500) / 6 % (1000, 1500), ONAN, rises 45/50 K, hot-spot 98 °C | [V] T12-01 (SEC 51-SDMS-04 Rev.02) |
 | RMU | 2 × 400 A LBS + 1 tee-off (fuse-switch or CB), EFI, 21 kA 1 s | [V] |
-| MV earthing | low-resistance (default, NER limiting earth fault to 1000 A) or solid | earthing types [V]; **1000 A is [A]** (SEC NER value not public; within the 100–2000 A range for resistance earthing [E-03]) |
-| FPI thresholds | phase 400 A, earth 60 A defaults within vendor ranges | [V vendor ranges, P-05]; chosen values [A] |
+| MV earthing | low-resistance (default **[A]**, NER limiting earth fault to 1000 A) or solid | both allowed by SEC [V]; NERs purchased (57-SDMS-01) [V] but a filled 13.8 kV schedule reads "Solidly" [V] — default is an assumption; **1000 A is [A]** (within 100–2000 A range [E-03]) |
+| FPI | type earth-only (default) or three-phase; thresholds phase 400 A, earth 60 A | type [V, DPS 2004]; ranges [V vendor, P-05, SP2]; chosen values [A] |
 | Ambient | summer air 43 °C mean daily max (July), extreme 50 °C; design 55 °C | [V] |
 | Harmonics (for later PQ mode) | 13.8 kV THD 4.0 % | [V] K2 |
 
 ## F9. Not modelled in v1 (stated in Model notes)
 
-Three-phase unbalance and LV networks; electromagnetic transients (lightning, switching surges, ferroresonance, current chopping); arcing-fault physics; IEEE 1584 arc-flash energy (equations not public — only a labelled proxy may appear as explanation); protection relay tolerances; CT waveform saturation; OLTC/voltage regulation dynamics; generator dynamics (frequency mode later uses a single-bus swing equation); real geographic Riyadh data.
+IEC 60076-7:2018 changes (not read); cable thermal dynamics; three-phase unbalance and LV networks; electromagnetic transients (lightning, switching surges, ferroresonance, current chopping); arcing-fault physics; IEEE 1584 arc-flash energy (equations not public — only a labelled proxy may appear as explanation); protection relay tolerances; CT waveform saturation; OLTC/voltage regulation dynamics; generator dynamics (frequency mode later uses a single-bus swing equation); real geographic Riyadh data.

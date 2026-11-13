@@ -43,23 +43,24 @@ Teaching moments embedded across modes (not standalone): five safety rules, perm
 ### 3.3 Player actions
 - Remote open/close (automated RMUs, feeder CBs).
 - Dispatch crew to an RMU; on arrival: read local FPIs, operate switches, apply earth on an isolated section, report.
-- Reclose a feeder breaker (subject to re-energisation rules).
+- Reclose a feeder breaker or close onto a suspect section — only through the **re-energisation check** (delay or evidence, crews clear, switchgear duty, explicit risk-assessment confirmation).
 - Request repair crew on a proven-faulted, isolated and earthed section.
 - Close NOP / move NOP (backfeed).
 
 ### 3.4 Rules that make decisions interesting (all sourced or labelled)
 - Feeder breaker trips on the fault (protection from engine F3). Auto-reclose is disabled on cable feeders [OP-05, SP2].
-- FPIs between the source and the fault light up; earth-only FPIs can't be trusted for **negative** indication [OP-05 §11.3]. Some FPIs may be unreadable remotely (non-automated RMUs).
-- **Re-energising onto a suspect section** is allowed only as a control-room decision: after the delay (night 5 min, day 20 min) unless FPI/automation evidence says the section is healthy [OP-06 Table 10.1, OP-05 §13.8]; crews must be clear of the circuit's substations [OP-05 §13.15]. Re-energising onto the fault trips the breaker again, adds fault-make duty to the switchgear, and costs time.
-- **Backfeed capacity:** closing the NOP at summer peak may overload the healthy half-ring (power-flow check); overload causes the protection to trip it or ages cables/transformers.
+- FPIs between the source and the fault light up. Many RMUs carry **earth-fault-only** indicators (SEC DPS 2004) — a phase-to-phase fault lights **none** of them, and an unlit earth-only FPI never proves a section healthy [OP-05 §11.3]. Some FPIs are unreadable remotely (non-automated RMUs).
+- **Re-energising onto a suspect section** is a control-room decision behind **hard gates** (D-008): delay elapsed (default "UK DNO example rule-set": 5 min 22:00–06:00, 20 min otherwise [OP-06 Table 10.1]) unless FPI/automation evidence shows the section healthy [OP-05 §13.8]; crews clear of the circuit's substations [OP-05 §13.15]; fault-make duty remaining; explicit risk-assessment confirmation. Re-energising onto the fault trips the breaker again, uses switchgear duty, may damage cable screens (solid earthing), and is recorded on the safety & asset record.
+- **Backfeed capacity:** closing the NOP at summer peak may overload the healthy half-ring or exceed the voltage-drop limit (power-flow check); re-energised AC load returns with cold-load pickup **[A]**; overload trips protection or ages cables/transformers.
 - **Isolation & earthing before repair:** open both ends, prove dead, earth (interlocks enforced: earth switch only on a dead, isolated section; cannot close a ring switch onto an earthed cable).
-- **Safety violations** (attempting an unsafe action is blocked and logged; some are scored as violations): attempting to earth a live section, re-energising before delay without evidence, energising while crews are inside the circuit. Any scored violation ⇒ run can't earn stars.
+- **Safety & asset record (separate from CML, never tradeable — D-008):** unsafe actions are blocked by gates/interlocks and logged as attempts; asset events (fault-make operations, screen overheating, transformer overload ageing) are listed. Any safety violation ⇒ no stars.
+- **Safety framing:** a fixed notice in tutorial and Model notes — "The game's switching logic follows a generic safe sequence (UK DNO model). It is not SEC's operating rules, not an authorisation, and not a substitute for training."
 
 ### 3.5 Scoring
 - **Primary:** customer minutes lost (CML) — Ofgem 3-min convention by default, IEEE 5-min shown alongside [OP-01/02].
 - **Secondary:** customers interrupted (CI), number of switching operations, fault-make operations, overload minutes.
-- **Stars vs par:** par = CML achieved by the built-in reference strategy (half-splitting by customer count, as documented by SSEN [OP-06 §12.1.2]) computed by running the engine. ★ = all customers restored except the faulted section, 0 violations; ★★ = CML ≤ 1.25 × par; ★★★ = CML ≤ par.
-- **Share string:** `⚡ مناوبة/Grid Shift · Daily 2026-11-13 · ★★★ · CML 41,200 (par 45,800) · 6 ops` + replay URL.
+- **Stars vs par:** par = CML achieved by the built-in **reference strategy** (half-splitting by customer count, as documented by SSEN [OP-06 §12.1.2]) computed in the browser by running the engine on the same seed — labelled "reference strategy", not "optimal". Players can beat par. ★ = all customers restored except the faulted section, 0 violations; ★★ = CML ≤ 1.25 × par; ★★★ = CML ≤ par.
+- **Share string:** `⚡ مناوبة/Grid Shift · Daily 2026-11-13 · ★★★ · CML 41,200 (par 45,800) · 6 ops` + replay URL carrying the engine/data version (D-010).
 
 ### 3.6 Difficulty
 | Lever | Easy | Normal | Hard | Expert |
