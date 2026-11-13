@@ -91,6 +91,15 @@ Not yet a golden test: CT158 §3.5 (30 kV network with transformer zero-sequence
 | Relay operate time non-increasing with current, all 7 curves | sweep 1.01×–40× | pass |
 | **FPI indication logic**: only indicators on the source→fault path flag; none flag off-path (incl. cable charging); earth-only types dark on symmetrical faults | 30 generated faults | pass |
 
+## 6c. Grading mode (`tests/unit/grading.test.ts`, e2e)
+
+| Check | Result |
+|---|---|
+| Fault currents ordered LV < cable < busbar, min < max; busbar 3PH = S″k/(√3·Un) exactly | pass (30 seeds) |
+| Reference grading exists and passes all rules (load, inrush 12×In 100 ms, CTI 0.3 s at all fault cases, primary ≤ 2 s) | pass (60 seeds) |
+| Rules detect violations (zero margin, pickup below overload, high-set below inrush) | pass |
+| e2e: reference settings loaded by link show "All rules pass" and ★★★ | pass |
+
 ## 7. Browser (`tests/e2e/app.spec.ts`, Playwright)
 
 | Check | Local (Chromium) | CI (Chromium, Firefox, WebKit) — all 15 passed in run 43453723047 |

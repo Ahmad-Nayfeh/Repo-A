@@ -93,3 +93,15 @@ test('log shows translated entries, never raw engine values (G re-verification r
     for (const raw of [' true', ' false', 'proveDead', 'readFpi', 'attendDamage', ' close\n', ' open\n']) expect(text).not.toContain(raw);
   }
 });
+
+test('Grading: renders the TCC chart; the reference grading loaded via link passes every rule (★★★)', async ({ page }) => {
+  const { generateGrading, referenceGrading } = await import('../../src/engine/grading');
+  const g = generateGrading(5);
+  const par = referenceGrading(g)!.settings;
+  const enc = (['T', 'F', 'I'] as const).map((k) => { const r = par[k]; return [r.curve.replace('IEC_', ''), r.pickupA, r.tms, r.hsA ?? '', r.hsDelayS ?? ''].join(','); }).join(';');
+  await page.addInitScript(() => localStorage.setItem('gs.lang', 'en'));
+  await page.goto(`/#/grading?s=5&r=${encodeURIComponent(enc)}`);
+  await expect(page.locator('svg.tcc')).toBeVisible();
+  await expect(page.getByText(/All rules pass/)).toBeVisible();
+  await expect(page.locator('.starline')).toHaveText('★★★');
+});

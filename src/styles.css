@@ -160,3 +160,21 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .eng input, .row input[type=checkbox] { width: 22px; height: 22px; }
 .eng { min-height: 44px; }
 .hud .ghost { min-width: 44px; font-size: 1.3rem; }
+
+/* grading */
+.tcc { width: 100%; height: auto; background: var(--bg2); border-radius: 8px; }
+.tcc .grid { stroke: var(--line); stroke-width: 0.6; }
+.tcc .axis { fill: var(--muted); font-size: 11px; }
+.tcc .fault { stroke: var(--off); stroke-width: 1; stroke-dasharray: 4 3; }
+.tcc .inrush { fill: var(--warn); stroke: var(--text); }
+.tcc .par { fill: none; stroke: var(--muted); stroke-width: 1.2; opacity: 0.7; }
+.relay-card { border: 2px solid var(--line); border-radius: 10px; margin: 0 0 10px; padding: 8px 10px; }
+.relay-card legend { font-weight: 700; padding: 0 6px; }
+.relay-card input[type=number] { width: 7.5em; }
+.small { font-size: 0.82rem; }
+.starline { color: var(--accent); letter-spacing: 2px; }
+.badge { font-size: 0.7rem; background: var(--accent); color: #111; border-radius: 6px; padding: 2px 6px; vertical-align: middle; }
+.checks { padding-inline-start: 1em; }
+.grading .card { margin-top: 12px; }
+.row label.toggle { flex-direction: row; align-items: center; }
+.tcc .fault-label { fill: var(--off); font-size: 10px; }

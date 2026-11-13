@@ -6,7 +6,7 @@
 ### لعبة واقعية ثنائية اللغة لتشغيل شبكات التوزيع: حدِّد العطل، وحافظ على السلامة، وأعِد الكهرباء لكل مشترك.
 
 [![CI](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml/badge.svg?branch=claude/new-session-k41b2n)](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-50%20unit%2Fgolden%2Fproperty%20%2B%2018%20e2e-brightgreen)
+![Tests](https://img.shields.io/badge/tests-64%20unit%2Fgolden%2Fproperty%20%2B%2024%20e2e-brightgreen)
 ![Physics](https://img.shields.io/badge/physics-validated%20against%20published%20references-blue)
 ![Languages](https://img.shields.io/badge/languages-العربية%20%7C%20English-orange)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -24,6 +24,7 @@
 - [What is this?](#-what-is-this)
 - [Screenshots](#-screenshots)
 - [How a shift works](#-how-a-shift-works)
+- [New: Grading mode](#️-new-grading-mode-protection-coordination)
 - [Why it is credible: validated physics](#-why-it-is-credible-validated-physics)
 - [Play it](#-play-it)
 - [Architecture](#-architecture)
@@ -101,6 +102,21 @@ What makes the decisions interesting:
 
 ---
 
+## ⚖️ New: Grading mode (protection coordination)
+
+Set three overcurrent relays in a chain, **RMU tee-off breaker → feeder breaker → grid-station incomer**, so that:
+- the nearest relay trips first, with at least a **0.3 s** grading margin (IEEE 242 range 0.25–0.4 s);
+- no relay trips on load, and the tee-off does not trip on **transformer inrush** (12 × In for 100 ms);
+- every fault is cleared quickly.
+
+The engine applies faults at the transformer LV terminals, on the cable and at the busbar, at maximum and minimum levels. It plots everything on a log-log time–current chart and compares your total clearing time with a reference grading.
+
+| Grading on desktop (reference shown in grey) | Arabic on a phone |
+|---|---|
+| <img src="docs/media/grading-en.png" alt="Grading mode with time-current chart" width="560"> | <img src="docs/media/grading-ar-phone.png" alt="Grading mode in Arabic on a phone" width="220"> |
+
+---
+
 ## ✅ Why it is credible: validated physics
 
 Every engine model is checked against **published worked examples**. Excerpt from [`docs/VALIDATION.md`](docs/VALIDATION.md):
@@ -113,6 +129,7 @@ Every engine model is checked against **published worked examples**. Excerpt fro
 | NER-limited earth fault | Dyn 33/11 kV worked example | 10,497 A solid → 399 A with 15.9 Ω | **10,497 A → 399.1 A** |
 | Relay curves | IEC 60255-151 / IEEE C37.112 (35 points) | e.g. SI 10.029 s @ 2× | **10.029 s** (±0.1 %) |
 | Reliability metric | Ofgem worked example | 34 min | **34 min** |
+| Transformer thermal (for Heatwave mode) | IEC 60076-7 Annex C, 41 steps | 90.5 … 176.1 °C; 6.15 days loss of life | **worst error 0.05 K; 8,851 min** |
 | Determinism | same seed + actions on V8, SpiderMonkey, JavaScriptCore | identical | **identical (CI, 3 engines)** |
 
 Every Saudi parameter carries a source ID ([`research/SOURCES.md`](research/SOURCES.md), ~420 entries) or is **labelled as an assumption** in the in-game Model notes. No proprietary or employer data is used.
@@ -132,7 +149,9 @@ git clone https://github.com/Ahmad-Nayfeh/Repo-A.git && cd Repo-A
 npm ci && npx vite build && npx vite preview
 ```
 
-Then open http://localhost:4173. Modes: **Training ring** (3 guided faults), **Daily challenge**, **Free play** (Easy · Normal · Hard).
+Then open http://localhost:4173. Modes:
+- **Night Shift:** Training ring (3 guided faults), Daily challenge, Free play (Easy · Normal · Hard).
+- **Grading:** protection coordination.
 
 **Run the checks:**
 ```bash
@@ -219,8 +238,8 @@ Every phase was gated by a fresh-context reviewer, and every finding is tracked 
 ## 🗺️ Roadmap
 
 1. Persistent "home district" and a condition-of-the-day rotation for the daily.
-2. **Grading** mode: protection coordination puzzles.
-3. **Heatwave** mode: IEC 60076-7 thermal model with SEC transformer parameters (research done).
+2. ✅ ~~Grading mode~~ shipped; next: earth-fault grading levels and fuse curves.
+3. **Heatwave** mode: the thermal engine is done and validated; it still needs LV load transfer and demand response.
 4. **Planning** mode: SEC planning rules and loss capitalisation.
 5. Case files: voltage-sag detective, capacitor resonance, broken neutral, GB 9 Aug 2019 frequency event.
 
@@ -266,7 +285,7 @@ Full list: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Current state: [`docs/STATUS.
 
 ### ما القادم؟
 
-- وضع **«التنسيق»** لضبط المرحّلات والتنسيق بينها.
+- ✅ وضع **«التنسيق»** متاح الآن: اضبط مرحّلات التفرع والمغذّي والمغذّي الرئيسي على منحنى زمن–تيار لوغاريتمي.
 - وضع **«موجة الحر»** لتحميل المحولات حراريًا بمعاملات مواصفات الشركة السعودية للكهرباء.
 - وضع **«التخطيط»** للتوسعة.
 - **ملفات حالات** لجودة القدرة.

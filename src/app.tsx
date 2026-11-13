@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { lang, applyDocLang, store, t } from './i18n/i18n';
 import { Home, ModelNotes, Glossary, About } from './ui/Pages';
 import { Game } from './ui/Game';
+import { Grading } from './ui/Grading';
 import { GameSession, dailySeed, dailyDifficulty, todayUTC, decodeActions, TRAINING, ENGINE_VERSION, dailyResult } from './ui/session';
 import type { Difficulty } from './engine/scenario/district';
 import { generateScenario } from './engine/scenario/district';
@@ -66,6 +67,7 @@ export function App() {
       {inGame && session && <Game key={`${route.path}?${route.q}`} s={session} onExit={() => go('#/')} onNext={session.mode === 'training' && session.training < 2 ? () => go(`#/training?t=${session.training + 1}`) : undefined} />}
       {inGame && !session && !notice && <p class="muted">{t('loading')}</p>}
       {route.path === '/' && <Home go={go} theme={theme} setTheme={setThemeS} />}
+      {route.path === '/grading' && <Grading key={route.q.get('s') ?? '1'} seed={Number(route.q.get('s') ?? 1) >>> 0} initial={route.q.get('r')} onExit={() => go('#/')} />}
       {route.path === '/notes' && <ModelNotes go={go} />}
       {route.path === '/glossary' && <Glossary go={go} />}
       {route.path === '/about' && <About go={go} />}

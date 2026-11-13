@@ -36,6 +36,11 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
           <div class="btns">{[0, 1, 2].map((i) => <button key={i} onClick={() => go(`#/training?t=${i}`)} title={t(`trDesc${i}`)}>{fmt(i + 1)} · {t(`trDesc${i}`)} {'★'.repeat(trainingStars[i]!)}</button>)}</div>
         </article>
         <article class="card">
+          <h2>⚖️ {t('grading')} <span class="badge">{t('newBadge')}</span></h2>
+          <p>{t('gradingDesc')}</p>
+          <button class="primary" onClick={() => go(`#/grading?s=${seed || '1'}`)}>{t('play')}</button>
+        </article>
+        <article class="card">
           <h2>{t('freePlay')}</h2>
           <p>{t('freePlayDesc')}</p>
           <div class="row">
