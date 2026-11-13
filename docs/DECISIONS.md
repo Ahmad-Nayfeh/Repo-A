@@ -79,3 +79,8 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 - G-11 handled with release review 1 (P-01 fault-type mix).
 - **G-12 (overload had no consequence):** ★★★ now also requires minutes above cable rating ≤ the reference strategy's. CML stays a pure regulatory metric. Relays still do not trip below their 400 A pickup — that is physically correct; managing overload is the operator's job.
 - Deferred to v1.x (ROADMAP): compact replay encoding (G-22), Hard always 15:00 summer (variety comes with the condition-of-the-day rotation), stronger par on Easy.
+
+## D-016 — Next mode is Grading (relay chain), not Heatwave (2026-11-13)
+- Evidence: in the v1 network model, moving normally-open points does not change transformer load (each transformer serves its own customers), so a Heatwave mode would need LV load-transfer or demand-response modelling first (D3-14 observed the same). The transformer thermal engine is built and validated (VALIDATION §3b) and waits for that.
+- Grading uses only validated parts (IEC curves, short circuit) plus sourced constraints (CTI 0.25–0.4 s, inrush 12×In 100 ms, pickup above load). Fuse curves remain unsourced, so the chain uses a breaker-type RMU tee-off (SEC 32-SDMS-04).
+- Reversible: yes.

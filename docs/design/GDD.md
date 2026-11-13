@@ -93,6 +93,25 @@ Daily **condition of the day** rotation (D3-04): solid-earthing district, heat (
 | Loading | ≤ 50 % | ≤ 50 %, summer | stressed 55–65 % **[A]**, 40 °C ground |
 | Other | — | damage reports | comms loss |
 
+## 3b. Mode 2 — Grading (protection coordination), v1.1
+
+**Core loop:** a generated radial protection chain from the grid station to one package substation: **incomer relay (I)** on the 132/13.8 kV transformer secondary → **feeder relay (F)** at the feeder breaker → **tee-off breaker relay (T)** in a breaker-type RMU (SEC 32-SDMS-04 RMUs have a breaker tee-off [KSA-07]) feeding a 500/1000/1500 kVA transformer. The player sets each relay's IEC curve (SI/VI/EI), pickup and time multiplier, plus an optional high-set stage on T. The engine applies faults at the transformer LV terminals (seen through the transformer impedance), on the feeder cable, and at the 13.8 kV busbar, at maximum (c = 1.1, bolted) and minimum (c = 1.0, with fault resistance) levels. It then shows a log-log time–current plot and a pass/fail list.
+
+**Rules (sourced):**
+- Each relay's pickup is above its maximum load: T > 150 % transformer overload [PR-08]; F > full-ring backfeed current; I > the incomer's firm load [A]. Source: PR-07, PR-23.
+- T must not operate on magnetising inrush, modelled as 12 × In for 100 ms [PR-08].
+- Downstream trips first. The upstream margin must be ≥ the CTI, checked at the maximum through-fault current [PR-23]. The CTI is 0.3 s, inside the verified 0.25–0.4 s range [PR-22].
+- Every fault is cleared by its primary relay at the minimum fault level within 2 s [A].
+
+**Score:** total clearing time across all fault cases (faster = less damage and less arc energy) with all rules passing. Stars compare the score against an in-browser grid-search **par**.
+
+**Replayability:** seeded source fault level, cable length, transformer size, incomer rating. Shares the daily, free-play and URL machinery.
+
+**Scope (labelled):**
+- Phase elements only. Earth-fault grading is the next level.
+- LV faults are three-phase, seen through Dyn11 at MV.
+- Ideal relays; no CT saturation.
+
 ## 4. Retention (v1)
 1. **Daily** per mode (UTC-date seed; one scored attempt), with a condition-of-the-day rotation.
 2. **Training ring**: three faded faults (§5).
