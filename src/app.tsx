@@ -4,6 +4,8 @@ import { Home, ModelNotes, Glossary, About } from './ui/Pages';
 import { Game } from './ui/Game';
 import { GameSession, dailySeed, dailyDifficulty, todayUTC, decodeActions, TRAINING, ENGINE_VERSION, dailyResult } from './ui/session';
 import type { Difficulty } from './engine/scenario/district';
+import { generateScenario } from './engine/scenario/district';
+import { runBot } from './engine/bot';
 
 function parseHash(): { path: string; q: URLSearchParams } {
   const h = location.hash.replace(/^#/, '') || '/';
@@ -50,6 +52,12 @@ export function App() {
     } else setSession(null);
   }, [route]);
 
+  // test & bot seam (docs/org/game-design.md: agents need a harness to play); scores are local, so nothing to protect
+  (window as unknown as { __gs: unknown }).__gs = {
+    session: () => session,
+    botHash: (seed: number, d: Difficulty) => runBot(generateScenario(seed, d)).sim.hash(),
+    botActions: (seed: number, d: Difficulty) => runBot(generateScenario(seed, d)).actions,
+  };
   const go = (h: string) => { location.hash = h; };
   const inGame = ['/daily', '/training', '/play'].includes(route.path);
   return (

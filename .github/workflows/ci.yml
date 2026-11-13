@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - name: Unit, golden and gate tests (golden data fetched at test time, D-005)
+        run: npm test
+      - run: npx vite build
+      - name: Install browsers (Chromium, Firefox, WebKit — mandatory for the determinism gate)
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: End-to-end, accessibility and cross-engine determinism
+        run: npx playwright test --trace off
