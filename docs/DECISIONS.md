@@ -23,3 +23,16 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 - Decision: alfanar documents may remain in research notes only as a flagged cross-check; the game model must take every value from non-employer sources (NKT, Nexans, Top Cable, Eland, Schneider, ABB, standards). Round 2 must supply replacements.
 - Alternatives: use it since it is public (rejected — rule 5 is about avoiding any appearance of using employer material).
 - Reversible: yes.
+
+## D-005 — Golden tests store published results, not third-party input files (2026-11-13)
+- Evidence: IEEE PES test-feeder files say "All rights reserved" with no open licence; MATPOWER excludes its case files from its BSD licence [PF-01, PF-09].
+- Decision: The repo contains (a) our own original networks, (b) short published *result* values with citations (facts used for comparison), and (c) where an input network from a paper is needed (e.g., Baran & Wu 33-bus line/load table), it is re-typed from the published paper as numeric data with a citation, treated as factual data — and flagged in VALIDATION.md. Raw .m/.zip/.xls files are never committed. Cross-validation with pandapower (BSD-3) happens offline/dev-only.
+- Alternatives: commit raw files (licence risk); skip published cases (loses validation).
+- Risk/uncertainty: whether numeric tables from papers are protected is a legal question we cannot settle; impact is small and reversible (remove the fixture).
+- Reversible: yes.
+
+## D-006 — Saudi parameters default to SEC public documents, labelled by edition (2026-11-13)
+- Decision: Network defaults follow SEC DPS 2004 / Grid Code 2021 / SDMS specs (13.8 kV, 60 Hz, open loop between grid stations, 50 % loading, ≤7.5 km to NOP, 3×300 Al XLPE, package substations 500/1000/1500 kVA Dyn11, RMU 400 A 21 kA 1 s). Where SEC data is not public (NER value, FPI settings, crew times, UFLS table), values are labelled **assumption** in Model notes, and made scenario parameters.
+- MV earthing default: low-resistance earthed (SEC has an NER spec, 57-SDMS-01) with an assumed limit chosen in FIDELITY.md; solid earthing is selectable.
+- Operational procedure (halving by customers, backfeed via NOP, re-energisation delays, duty counts) follows documented UK DNO practice (SSEN), labelled as such, because no SEC operating manual is public.
+- Reversible: yes (data tables).

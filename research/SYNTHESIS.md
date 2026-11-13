@@ -1,7 +1,7 @@
 # SYNTHESIS — what research says, and what it means for the game
 
-_Status: draft v1 (after research round 1; round 2 gap-filling in progress — see §7)._
-_Every claim cites topic-note IDs; the notes cite the primary sources. ID prefixes: KSA- (01), SC-/N-/F-/Z-/E-/P-/C-/A- (02), PR- (03), PF- (04), TH- (05), PQ- (06), OP- (07), GD- (08)._
+_Status: draft v2 (rounds 1 + 2 folded in; awaiting independent review)._
+_Every claim cites topic-note IDs; the notes cite the primary sources. ID prefixes: K2- (09), SP2- (10), AS2- (11), KSA- (01), SC-/N-/F-/Z-/E-/P-/C-/A- (02), PR- (03), PF- (04), TH- (05), PQ- (06), OP- (07), GD- (08)._
 _Label convention: **[V]** verified by reading the source, **[S]** snippet / secondary only, **[D]** derived by us (arithmetic or inference), **[A]** game assumption (no source; shown as such in-game)._
 
 ---
@@ -26,6 +26,10 @@ The research supports a map with five layers. Each later layer depends on the ea
 - Main cable 3×300 mm² Al XLPE (300 A, R 0.130 Ω/km, X 0.108 Ω/km at 60 Hz) [V, KSA-02].
 - MV neutral **solidly or low-resistance earthed** (SEC specs allow both; which one Riyadh uses is **not found**) [V/NOT FOUND, KSA-05/06/09].
 - Design ambient 55 °C outdoors; Riyadh July mean max 43.4 °C [V, KSA-01/21].
+- Grid Code Issue 3 (Dec 2021, SEC's own PDF): frequency bands, unbalance 1 %, flicker Pst 0.8/Plt 0.6, fault clearing 120/100/80 ms unchanged from 2007; new RoCoF withstand (1 Hz/s synchronous, 2.5 Hz/s inverter plants) [V, K2].
+- **Harmonic limit at 13.8 kV: voltage THD 4.0 % (odd 3.0 %, even 1.75 %)** (DPS 2004 Table 1.1 and SERA PQ draft Annex 1); the Grid Code's "THD 1.5 %" is the default for plant on the ≥110 kV transmission system only [V, K2].
+- SEC SAIDI 112.6 / 78.6 / 68.5 min and SAIFI 2.61 / 1.71 / 1.47 for 2020 / 2023 / 2024; 2025 targets 61 min / 0.70 [V/S mixed, K2 — improvement percentages conflict between SEC documents].
+- SEC has an NER specification for 11–34.5 kV primary substations (57-SDMS-01, 2017, 10 s rating), resistor value left to project data [V, K2] — supports the low-resistance-earthed default, value still unknown.
 - Scale: 11.3 M customers, ~697 k distribution transformers (2024) [V, KSA-13]; SEC average interruption duration 190.9 → 111.4 min/customer (2017 → 2020) [V, KSA-15].
 
 ## 2. Which parts make good gameplay
@@ -42,7 +46,7 @@ Ranked by (a) decision richness, (b) feedback clarity, (c) fidelity we can actua
 | 6 | **System frequency event** (GB 9 Aug 2019 replay; inertia/UFLS) | Official report numbers [V, PQ-29]; swing equation validated against NREL example [V] | Yes, single-bus aggregate; Saudi UFLS stages not public [NOT FOUND] |
 | 7 | **Safety / switching programme authoring**: write a correct isolation & earthing sequence | Five safety rules, permits, interlocks, phasing [V/S, OP]; must show only safe practice | Logic rules only (no physics needed) — good *inside* mode 1 rather than standalone |
 | 8 | **Arc-flash "clearing time is the dial"** | Incident energy ∝ arcing time is the key teaching point [S/V, PQ-24]; IEEE 1584-2018 equations are **not** publicly available → only a labelled proxy | Proxy only — use as an explanatory screen, not a scored mode |
-| 9 | Maintenance / asset management (thermography, DGA, health index) | Mechanisms verified; numeric thresholds mostly NOT FOUND in round 1 (round 2 pending) | Weak until round 2 closes gaps |
+| 9 | Maintenance / asset management (thermography, DGA, health index) | Round 2 verified NETA ΔT bands, Duval zones, CNAIM health-index method, NFPA 70B intervals, EPRI failure medians | Medium: thresholds & HI method sourced; ageing curves (Weibull) still assumed |
 
 **Our recommendation (opinion):** modes 1–4 form the core; 5–6 are authored "case files" on the same engine; 7 and 8 are embedded teaching moments; 9 waits for data.
 
@@ -66,7 +70,7 @@ Ranked by (a) decision richness, (b) feedback clarity, (c) fidelity we can actua
 
 **Performance:** BFS on 513 buses ≈ 0.04 ms in Node [D, own benchmark]. Physics will not be the browser bottleneck; rendering and UX will.
 
-**Data licensing:** IEEE test-feeder files and MATPOWER case files are **not** openly licensed [V, PF-01/09]. Golden tests will store only published *results* with citations, and our own original networks will be cross-checked offline against pandapower (BSD-3). This is decision D-005 (to be logged).
+**Data licensing:** IEEE test-feeder files and MATPOWER case files are **not** openly licensed [V, PF-01/09]. Golden tests will store only published *results* with citations, and our own original networks will be cross-checked offline against pandapower (BSD-3). This is decision D-005.
 
 ## 4. Gaps no existing game fills
 
@@ -101,14 +105,17 @@ From the survey of ~20 titles [GD §1]:
 | SEC FPI thresholds / types | Use vendor-range values [V vendor]; labelled |
 | Crew travel/operate times at night in Riyadh | **[A]** labelled game parameters (no public data found [OP §4]) |
 | SEC reliability definitions (3 vs 5 min threshold) | Show both IEEE and Ofgem conventions; configurable |
-| SEC UFLS stages | Use GB stages as reference, labelled; Saudi values NOT FOUND (round 2 pending) |
+| SEC UFLS stages | First stage 59.2 Hz with 0.2 Hz steps of 5–10 % load (GCCIA, T&D World 2012) [S/V, K2]; full table NOT FOUND → labelled illustrative |
 | IEEE 1584 arc-flash equations | Proxy only, labelled |
-| Fault rates per km, fault-type shares | Snippet-only → used as labelled scenario-generation weights, not displayed as facts |
+| Fault rates per km, fault-type shares | EPRI medians per 100 conductor-mi·yr: cable 1.3, joints 0.4, terminations 0.2 [V, SP2/AS2]; fault-type shares still snippet-only → scenario weights labelled as assumptions |
 | Most SEC documents are 2004–2008 editions | Model notes state the edition year of each rule |
 | UK practice (SSEN) used for operational procedure | Model notes say: procedure is documented UK DNO practice; SEC equivalents not public |
-| Harmonic limit at 13.8 kV (2007 Grid Code 1.5 % vs DPS ~4 %) | Round 2 checking; not used until resolved |
+| Harmonic limit at 13.8 kV | **Resolved in round 2:** THD 4.0 % at 13.8 kV; 1.5 % is transmission-only [K2] |
 
-**Round 2 (in progress):** KSA grid code 2021 + harmonic limits + earthing + reliability; SC/protection gaps (Dyn11+NER example, cable zero-sequence, coordination example, FPI thresholds, fuse tables); assets (thermography, DGA, failure rates, non-employer cable derating, SF6).
+**Round 2 results (now folded in):**
+- SC/protection [SP2]: NER+Dyn SLG example (low authority, recomputed: 11 kV, 15.9 Ω → 399 A); NKT cable R0/X0 table (fits R0 = R + 3·R_screen, screen-return case); Post Glover charging current ≈2.46 A/km at 13.8 kV; SEL "all faults on underground cables are permanent" (auto-reclose counterproductive) [V]; BAUR fault-location guide [V]; Glover Ex. 10.4 and 13.8 kV recloser/fuse scheme, NPAG-derived 11 kV grading example (via course notes) [V]; FPI thresholds (SEL, Ensto) [V]; ABB/SIBA kVA→fuse tables and ABB transfer-current example [V].
+- Assets [AS2]: NETA thermography ΔT bands (MTS-2007, via Fluke) [V]; Duval triangle 1 zone boundaries (Duval 2002) [V]; EPRI failure medians [V]; Ofgem CNAIM v2.1 health-index method and expected lives (RMU 55 y, transformer 60 y) [V]; NFPA 70B-2023 intervals [V]; Saudi Cable Company derating factors (ground 35 °C → 0.95, 40 °C → 0.90; soil to 2.5 K·m/W) [V]; EU F-gas 2024/573 Art. 13 SF6 dates (≤24 kV from 2026) [V via national authorities].
+- Still NOT FOUND: authoritative textbook Dyn+NER worked example; IEEE C57.104/IEC 60599 gas tables; Weibull parameters; cable thermal time constants; switchgear derating above 40 °C from ABB/Siemens/SEC; Riyadh NER value; SEC FPI settings; crew times.
 
 ## 8. Scope recommendation (input to Phase 2/3)
 
