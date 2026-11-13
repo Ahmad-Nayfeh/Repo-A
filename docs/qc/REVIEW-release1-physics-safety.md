@@ -316,3 +316,30 @@ Must fix before release:
 - Physics and gates: P-01 (fault-type mix), P-02 (FIDELITY overclaims), P-03 (property tests), P-14 (S-F IDs and check_sources).
 
 The Minor findings (P-04 to P-07, P-12, P-15 to P-18) can follow in v1.0.x.
+
+## Re-verification
+
+_Fresh clone at `8532c59` (fixes in `47a31d5` "Release review 1 fixes" and `9636dfd` "Release review 2 fixes"). Results: `npm ci` OK; `npx vitest run` 9 files, 50 tests, all pass; `node scripts/check_sources.mjs` passes (23 source IDs; 30 S-IDs in FIDELITY and 30 in Model notes; employer-data check clean)._
+
+- **P-01 — Resolved.** `FAULT_WEIGHTS.typeMix` [A] is now applied in `generateFault`. Insulation faults are SLG 0.85 / DLG 0.15. Third-party faults are SLG 0.3 / DLG 0.4 / 3PH 0.3. DLG faults are now generated. The mix is shown in note S-F2-04.
+- **P-02 — Resolved.**
+  - The 21 kA equipment check and the conductor I²t check are now in `sim.ts`. The rest-of-busbar C0 is in `shortcircuit.ts`.
+  - FIDELITY v3 marks each validation item as "implemented" (with the test file named) or "planned". CT saturation is listed as not modelled (S-F9-01).
+- **P-03 — Resolved.** `tests/property/physics.test.ts` covers:
+  - power balance (210 cases);
+  - voltage monotonic along each half-ring;
+  - fault current monotonic with Rf;
+  - fault current ≤ the c_max bolted value, and I_SLG ≤ I_3PH where |Z0| ≥ |Z1|;
+  - relay time monotonic with current;
+  - FPI logic.
+- **P-08 — Resolved, with one Minor residual.**
+  - Added: a `proveDead` crew action ("Test for absence of voltage (approved tester)"). Earthing is now blocked with `notProved` until the cable has been proved dead. Hint tr1_5 is updated.
+  - Residual: there is still no "identify/prove the cable dead at the work point before cutting" step at repair (OP-05 §14). I recommend a one-line note or hint.
+- **P-09 — Resolved.** `checkClose` now refuses a close by a crew onto unproven sections (`trialRemoteOnly`). Such trial closes must be made from a remote-controlled CB or switch.
+- **P-10 — Resolved, with one Minor residual.**
+  - The About page now names only power flow, short circuit, relay curves and reliability indices as validated. It says the FPI logic is tested, not validated.
+  - Residual: the EN footer still says "Physics validated against published references". I recommend "Core calculations checked against published examples".
+- **P-11 — Resolved.** New notes S-F3-04 (relay settings), S-F2-06 (source fault level, R/X, Z0/Z1), S-F2-04 (fault-type mix) and S-F3-05/06 (FPI). The coverage script passes.
+- **P-14 — Resolved.** FIDELITY now carries S-F IDs. `scripts/check_sources.mjs` exists and passes, and is run in CI per the fix commit.
+
+**Re-verification verdict: PASS.** All 8 Important findings are closed. The two Minor residuals above (repair-site prove-dead note, footer wording) do not block release.

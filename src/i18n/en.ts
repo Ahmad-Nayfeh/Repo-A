@@ -163,7 +163,7 @@ export const en = {
   newGame: 'New game',
   rulesetNote: 'The game\'s switching logic follows a generic safe sequence (UK DNO model). It is not SEC\'s operating rules, not an authorisation, and not a substitute for training.',
   assumption: 'assumption', verified: 'verified', derived: 'derived', secondary: 'secondary',
-  footer: 'Free & open. Physics validated against published references. Assumptions are labelled.',
+  footer: 'Free & open. Power-flow, short-circuit, relay and reliability models are validated against published references (see VALIDATION.md). Assumptions are labelled.',
   replayOldVersion: 'This link was made with engine version {v}; it is replayed with the current version {cur}, results may differ.',
   dailyLocked: 'Today\'s daily seed is reserved for the daily challenge until you have played it.',
 };

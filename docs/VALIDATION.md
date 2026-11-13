@@ -1,6 +1,6 @@
 # VALIDATION — engine results vs published references
 
-_Generated from test output on 2026-11-13 (engine version 1). Re-run with `npx vitest run` (47 tests) and `npx playwright test` (5 e2e). Every row is a passing automated test unless marked otherwise._
+_Generated from test output on 2026-11-13 (engine version 1). Re-run with `npx vitest run` (61 tests) and `npx playwright test` (5 e2e). Every row is a passing automated test unless marked otherwise._
 
 Label key: **published** = value printed in the source; **our-3-solver** = agreement of three independent solvers (ours, numpy, pandapower) on the same data (research/04 PF-C1).
 
@@ -42,6 +42,17 @@ Not yet a golden test: CT158 §3.5 (30 kV network with transformer zero-sequence
 | ABB: relay-2 TMS 0.172 at 2.4× gives ≥ 1.36 s (1.0 s + 0.36 s margin) | [PR-07] | ≥ 1.355 s | pass | — | pass |
 | Chakrabarti Ex 3.7.1 / 3.7.2 / 3.7.4 (graph-read) | [PR-24] | 1.575 / 0.945 / 0.56 s | 1.648 / 0.989 / 0.594 s | ±6 % (book reads a printed curve) | pass |
 | Travel integral: constant current operates at t(M); half-travel leaves t/2 | property | — | exact to 1e-12 | — | pass |
+
+## 3b. Transformer thermal (`tests/golden/thermal.test.ts`) — engine ready for the Heatwave mode
+
+| Case | Source | Published | Engine | Tolerance | Result |
+|---|---|---|---|---|---|
+| IEC 60076-7:2005 Annex C, 41-step difference equations, hot-spot every step | [TH-02] | 90.5 … 176.1 (peak) … 99.3 °C | worst error 0.050 K | ±0.15 K | pass |
+| Annex C cumulative loss of life (thermally upgraded paper) | [TH-02] | 8,851 min (6.15 days) | 8,851 min | ±1 % | pass |
+| Annex E OF unit, 30-min overload 0.8 → 1.4 (exponential method) | [TH-02] | θo 76.7 °C, θh 114.2 °C | 76.68 / 114.22 °C | ±0.1 K | pass |
+| Annex E after the overload and daily loss of life | [TH-02] | θh 92.9 °C one minute later; 0.14 day | not reproduced by design: 0.150 day | — | **documented difference**: the 2005 decreasing-step formula (eq. 8) applies the new gradient instantly; our model keeps Annex C winding dynamics |
+| Ageing points: V(110 °C, Kraft) = 4, V(98 °C) = 1, TUP V(110 °C) = 1 | [TH-02] | 4 / 1 / 1 | exact | 1e-10 | pass |
+| SEC 51-SDMS-04 emergency table (one-sided): from 75 % load, 133 % for 240/155 min and 150 % for 98/65 min at 30/40 °C keep θh ≤ 140 °C | [T12-d] | requirement | θh 116.4–120.8 °C for 500/1000/1500 kVA with SEC parameters (Δθor 45 K, Δθhr 18 K [D]) | ≤ 140 °C | pass |
 
 ## 4. Reliability metrics (`tests/golden/reliability.test.ts`)
 
