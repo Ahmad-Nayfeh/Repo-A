@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Rng > known-answer: first outputs for seed 1 are fixed (guards against accidental algorithm change) 1`] = `
+[
+  1828152527,
+  3394835397,
+  2967886022,
+]
+`;

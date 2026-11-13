@@ -1,0 +1,31 @@
+{
+  "name": "grid-shift",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Grid Shift / مناوبة الشبكة — a realistic, bilingual electricity distribution game",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "test": "vitest run",
+    "test:golden": "vitest run tests/golden",
+    "e2e": "playwright test --trace off"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "eslint": "^9.39.5",
+    "fast-check": "^3.23.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^6.4.6",
+    "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "@preact/signals": "^2.11.4",
+    "preact": "^10.29.8"
+  }
+}
