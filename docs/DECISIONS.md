@@ -12,3 +12,8 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 - Decision: 8 independent topics (see STATUS). Each agent writes notes + a per-topic bibliography with stable IDs (KSA-, SC-, PR-, PF-, TH-, PQ-, OP-, GD-). The lead merges into research/SOURCES.md and writes SYNTHESIS.md, then a second, deeper round targets gaps.
 - Alternatives: one sequential researcher (too slow, less breadth); finer split (more overlap/merge cost).
 - Reversible: yes.
+
+## D-003 — Deployment path deferred until a deployable build exists (2026-11-13)
+- Evidence: repo has a single branch `claude/new-session-k41b2n` (no `main`). Enabling GitHub Pages (Source = GitHub Actions) is a repository setting this session cannot change through its tools.
+- Decision: build a Pages workflow that deploys on push; create `main` via PR when the first playable build passes gates; document the one-time Pages settings click in NEEDS-AHMAD.
+- Reversible: yes.
