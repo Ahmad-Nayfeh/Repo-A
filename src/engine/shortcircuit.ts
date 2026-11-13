@@ -183,6 +183,7 @@ export function shortCircuit(netIn: Network, loc: FaultLocation, type: FaultType
       y0 = div(cx(1), z0);
       addShunt(y0r, y0i, k, y0.re, y0.im);
     }
+    if (s.restC0nF) addShunt(y0r, y0i, k, 0, omega * s.restC0nF * 1e-9); // rest-of-busbar feeders (D3-17)
     srcInfos.push({ id: s.id, k, y1, y0 });
   }
 

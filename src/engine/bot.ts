@@ -187,6 +187,8 @@ export function runBot(scenario: Scenario, opts: { oracle?: boolean; maxSteps?: 
     if (s.kind !== 'LBS') continue;
     const crew = crewTo(s.site);
     act({ kind: 'secure', crew, switch: id });
+    act({ kind: 'proveDead', crew, switch: id });
+    crewIdle(crew);
     act({ kind: 'earth', crew, switch: id, on: true });
     crewIdle(crew);
   }

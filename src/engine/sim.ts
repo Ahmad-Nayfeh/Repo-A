@@ -25,6 +25,7 @@ export type Action =
   | { kind: 'crewOp'; crew: number; switch: string; op: 'open' | 'close'; justification?: Justification }
   | { kind: 'readFpi'; crew: number }
   | { kind: 'secure'; crew: number; switch: string; on?: boolean }
+  | { kind: 'proveDead'; crew: number; switch: string }
   | { kind: 'earth'; crew: number; switch: string; on: boolean }
   | { kind: 'attendDamage'; crew: number }
   | { kind: 'permit'; cable: string; on: boolean }
@@ -37,7 +38,7 @@ export type Action =
 export type LogKind =
   | 'fault' | 'trip' | 'switch' | 'blocked' | 'crewArrive' | 'crewDone' | 'fpiRead' | 'damageReport'
   | 'damageAttended' | 'earth' | 'secure' | 'permit' | 'repairStart' | 'repairDone' | 'delayElapsed'
-  | 'overload' | 'undervoltage' | 'calls' | 'complete' | 'screenDamage' | 'dutyUsed';
+  | 'overload' | 'undervoltage' | 'calls' | 'complete' | 'screenDamage' | 'dutyUsed' | 'proveDead' | 'conductorDamage' | 'ratingExceeded';
 
 export interface LogEntry { t: number; kind: LogKind; data: Record<string, string | number | boolean> }
 
@@ -77,6 +78,10 @@ export class Simulation {
   tripT: number | null = null;
   suspect = new Set<string>();   // cables dead since the fault trip and not proven healthy
   permits = new Set<string>();
+  provedDead = new Set<string>();      // switch ids whose cable side was tested dead since last energisation
+  /** per ring: cables that can still contain the fault after trial-close trips (single-fault assumption) */
+  candidates = new Map<string, Set<string>>();
+  private lastNewly: { cables: Set<string>; t: number } | null = null;
   secured = new Set<string>();
   damageReported = false;
   damageAttended = false;
@@ -215,6 +220,7 @@ export class Simulation {
         if (this.t - off >= COLD_LOAD.afterOutageMin.value * MIN) this.restoredAt.set(l.id, this.t);
       } else if (!on && off === null) this.loadOff.set(l.id, this.t);
     }
+    for (const id of [...this.provedDead]) { const sw = this.swById.get(id)!; if (this.isEnergised(this.cableSideBus(sw))) this.provedDead.delete(id); }
     // FPIs reset on voltage return (vendor "voltage reset" feature [P-05]); stale ones do not
     for (const f of this.net.fpis) {
       const st = this.fpi.get(f.id)!;
@@ -286,7 +292,7 @@ export class Simulation {
       const cableId = this.scenario.rings.find((rg) => rg.ringSwitches[0] === cb.id || rg.ringSwitches[rg.ringSwitches.length - 1] === cb.id)!;
       const firstCable = cableId.ringSwitches[0] === cb.id ? cableId.cables[0]! : cableId.cables[cableId.cables.length - 1]!;
       if (this.sc) {
-        const seg = this.sc.cables.get(firstCable) ?? this.sc.cables.get(`${firstCable}#2`);
+        const seg = this.sc.cables.get(this.cbSegment(cb.id, firstCable));
         if (seg) { iPh = seg.iMax; i0 = seg.i3i0; }
       } else if (this.pf) {
         iPh = this.pf.cableA.get(firstCable) ?? 0;
@@ -307,7 +313,7 @@ export class Simulation {
   private doTrip(cbId: string, element: 'phase' | 'earth') {
     const cb = this.swById.get(cbId)!;
     if (!cb.closed) return;
-    const seg = this.sc ? (this.sc.cables.get(this.firstCableOf(cbId)) ?? null) : null;
+    const seg = this.sc ? (this.sc.cables.get(this.cbSegment(cbId, this.firstCableOf(cbId))) ?? null) : null;
     const iMax = seg ? seg.iMax : (this.pf?.cableA.get(this.firstCableOf(cbId)) ?? 0);
     const i3i0 = seg ? seg.i3i0 : 0;
     const phases = seg ? (['a', 'b', 'c'] as const).filter((p) => (p === 'a' ? seg.ia : p === 'b' ? seg.ib : seg.ic) > 0.25 * seg.iMax).join('') : 'abc';
@@ -318,6 +324,24 @@ export class Simulation {
       const ik = this.sc.earthCurrentA / 1000;
       const allowed = CABLE_3x300AL.screenIk1s_kA / Math.sqrt(Math.max(tClear, 1e-3));
       if (ik > allowed) { this.log.push({ t: this.t, kind: 'screenDamage', data: { cable: this.scenario.fault.cable, kA: Math.round(ik * 10) / 10 } }); }
+    }
+    if (this.sc && this.lastNewly && this.lastNewly.t === this.lastEnergiseT && this.lastNewly.cables.size > 0) {
+      // a fault trip right after energising a set of sections confines the fault to that set (single fault)
+      const ring = this.scenario.rings.find((r) => r.cables.some((c) => this.lastNewly!.cables.has(c)));
+      if (ring) {
+        const prev = this.candidates.get(ring.id);
+        const next = new Set([...this.lastNewly.cables].filter((c) => ring.cables.includes(c) && (!prev || prev.has(c))));
+        if (next.size > 0) this.candidates.set(ring.id, next);
+      }
+    }
+    // conductor adiabatic check and equipment rating check (FIDELITY F2/F4)
+    if (this.sc) {
+      const tClear = Math.max((this.t - this.lastEnergiseT) / 1000, 1e-3);
+      const ikA = this.sc.ikA;
+      const kS = CABLE_3x300AL.conductorK * CABLE_3x300AL.areaMm2;
+      if (ikA * ikA * tClear > kS * kS) this.log.push({ t: this.t, kind: 'conductorDamage', data: { cable: this.scenario.fault.cable } });
+      const eq = SYSTEM.equipmentIk.value;
+      if (ikA / 1000 > eq.kA) this.log.push({ t: this.t, kind: 'ratingExceeded', data: { kA: Math.round(ikA / 100) / 10 } });
     }
     cb.closed = false;
     cb.faultMakeLeft = Math.max(0, cb.faultMakeLeft - 1);
@@ -333,6 +357,14 @@ export class Simulation {
   }
 
   private lastEnergiseT = 0;
+
+  /** Segment id adjacent to the CB when the fault splits its first cable (A side: from-half; B side: to-half "#2"). */
+  private cbSegment(cbId: string, firstCable: string): string {
+    if (!this.sc || firstCable !== this.scenario.fault.cable) return firstCable;
+    const cab = this.net.cables.find((c) => c.id === firstCable)!;
+    const cb = this.swById.get(cbId)!;
+    return cab.from === cb.to ? firstCable : `${firstCable}#2`;
+  }
 
   private firstCableOf(cbId: string): string {
     const rg = this.scenario.rings.find((r) => r.ringSwitches[0] === cbId || r.ringSwitches[r.ringSwitches.length - 1] === cbId)!;
@@ -352,6 +384,9 @@ export class Simulation {
     if (!this.suspect.has(cableId)) return true;
     const ring = this.scenario.rings.find((r) => r.cables.includes(cableId));
     if (!ring) return false;
+    const cand = this.candidates.get(ring.id);
+    if (cand && !cand.has(cableId)) return true;                 // excluded by trial-close results (single fault)
+    if (this.damageAttended && this.damageCable() !== cableId && ring.cables.includes(this.damageCable()!)) return true; // fault confirmed at the damage site
     const fed = this.fedFrom(ring);
     if (!fed) return false;
     const idxs = ring.cables.map((c, i) => (this.suspect.has(c) ? i : -1)).filter((i) => i >= 0);
@@ -359,6 +394,11 @@ export class Simulation {
     if (lo > hi) return false; // contradictory evidence proves nothing
     const idx = ring.cables.indexOf(cableId);
     return idx < lo || idx > hi;
+  }
+
+  damageCable(): string | null {
+    const d = this.log.find((l) => l.kind === 'damageReport');
+    return d ? String(d.data.cable) : null;
   }
 
   /** Side from which the ring was feeding the fault (first trip on that ring). */
@@ -441,6 +481,7 @@ export class Simulation {
           if (!this.secured.has(s.id)) return this.block('notSecured', { switch: s.id });
           const cableBus = this.cableSideBus(s);
           if (this.isEnergised(cableBus)) return this.block('liveCable', { switch: s.id });
+          if (!this.provedDead.has(s.id)) return this.block('notProved', { switch: s.id });
           s.earthed = true;
           this.busy(c, 5 * MIN, 'earth', { switch: s.id });
         } else {
@@ -448,6 +489,18 @@ export class Simulation {
           s.earthed = false;
         }
         this.log.push({ t: this.t, kind: 'earth', data: { switch: s.id, on: a.on } });
+        return { ok: true };
+      }
+      case 'proveDead': {
+        // test for absence of voltage with an approved tester at the cable side of this panel (EN 50110 rule 3)
+        const c = this.crewAt(a.crew); if (!c) return { ok: false, reason: 'crewNotOnSite' };
+        const s = this.swById.get(a.switch);
+        if (!s || s.site !== c.site || s.kind !== 'LBS') return { ok: false, reason: 'wrongSite' };
+        if (s.closed) return this.block('proveClosed', { switch: s.id });
+        const live = this.isEnergised(this.cableSideBus(s));
+        if (!live) this.provedDead.add(s.id);
+        this.busy(c, 3 * MIN, 'proveDead', { switch: s.id });
+        this.log.push({ t: this.t, kind: 'proveDead', data: { switch: s.id, live } });
         return { ok: true };
       }
       case 'attendDamage': {
@@ -570,7 +623,7 @@ export class Simulation {
       this.recompute();
       if (!faultWasEnergised && this.faultEnergised()) {
         // closed onto the fault: device duty used
-        s.faultMakeLeft = Math.max(0, s.faultMakeLeft - 1);
+        if (s.kind !== 'CB') s.faultMakeLeft = Math.max(0, s.faultMakeLeft - 1); // a CB's duty is counted on its trip
         this.dutyUsed++;
         this.log.push({ t: this.t, kind: 'dutyUsed', data: { switch: swId, left: s.faultMakeLeft } });
         if (this.damageReported && !this.damageAttended) this.starEvents.push('energisedDamage');
@@ -581,7 +634,9 @@ export class Simulation {
     }
     this.onTopologyOrFaultChange();
     if (op === 'close') {
-      for (const c of this.net.cables) if (this.cableEnergised(c.id) && !beforeE.has(c.id) && !(this.faultPresent && c.id === this.scenario.fault.cable)) this.suspect.delete(c.id);
+      const newly = new Set(this.net.cables.filter((c) => this.cableEnergised(c.id) && !beforeE.has(c.id)).map((c) => c.id));
+      this.lastNewly = { cables: newly, t: this.t };
+      for (const c of newly) if (!(this.faultPresent && c === this.scenario.fault.cable)) this.suspect.delete(c);
     }
     this.checkComplete();
   }
@@ -616,6 +671,8 @@ export class Simulation {
     const unproven = newly.filter((c) => !this.provenHealthy(c));
     if (unproven.length > 0) {
       if (this.damageReported && !this.damageAttended && unproven.includes(this.scenario.fault.cable)) return fail('damageBlock');
+      // trial closes onto unproven sections are control-room decisions from a CB or remote switch (OP-05 §13; review P-09)
+      if (crew !== null) return fail('trialRemoteOnly');
       if (just === undefined) return { ok: false, reason: 'needChecklist', reasonData: { cables: unproven.length } }; // a request, not a near miss
       if (just === 'delay' && this.tripT !== null && this.t < this.tripT + this.reenergiseDelayMs()) return fail('delayNotElapsed', { leftMin: Math.ceil((this.tripT + this.reenergiseDelayMs() - this.t) / MIN) });
       if (just === 'evidence') return fail('evidenceInsufficient');

@@ -18,6 +18,8 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
+      - name: Source traceability, simplification coverage, employer-data check
+        run: node scripts/check_sources.mjs
       - name: Unit, golden and gate tests (golden data fetched at test time, D-005)
         run: npm test
       - run: npx vite build

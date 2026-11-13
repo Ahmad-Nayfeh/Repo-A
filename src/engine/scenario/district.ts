@@ -60,7 +60,7 @@ export function generateScenario(seed: number, difficulty: Difficulty, overrides
   const nerOhm = (kv * 1000) / Math.sqrt(3) / SOURCE.nerCurrentA.value;
   for (const [gs, x] of [['GA', 0], ['GB', W]] as const) {
     net.buses.push({ id: gs, kind: 'source', vnKV: kv, x, y: 0, label: gs });
-    net.sources.push({ id: `S-${gs}`, bus: gs, vSetPu: SOURCE.vSetPu.value, skMVA: SOURCE.skMVA.value, rx: SOURCE.rx.value, earthing: { kind: 'resistance', rOhm: nerOhm }, z0OverZ1: SOURCE.z0OverZ1.value });
+    net.sources.push({ id: `S-${gs}`, bus: gs, vSetPu: SOURCE.vSetPu.value, skMVA: SOURCE.skMVA.value, rx: SOURCE.rx.value, earthing: { kind: 'resistance', rOhm: nerOhm }, z0OverZ1: SOURCE.z0OverZ1.value, restC0nF: SOURCE.restC0nF.value });
     sites.push({ id: gs, kind: 'gs', x, y: 0, label: gs === 'GA' ? 'A' : 'B', remote: true, commsOk: true });
   }
   const groundTempC: 35 | 40 = spec.stressed ? 40 : 35;
@@ -182,10 +182,12 @@ function generateFault(rng: Rng, net: Network, rings: RingInfo[], spec: Difficul
   const cab = rng.weighted(cand, cand.map((c) => c.lengthKm));
   let frac = rng.range(0.1, 0.9);
   if (cause === 'termination') frac = rng.next() < 0.5 ? 0.02 : 0.98;
-  let type: FaultType = 'SLG';
-  let rf = rng.range(0, 3); // [A]
-  if (cause === 'third-party') { type = '3PH'; rf = rng.range(0, 0.5); }
-  else if (cause === 'termination') type = rng.pick(['SLG', 'LL', '3PH'] as const);
+  // fault-type mix — no public source for UG cable shares (SP2-26 NOT FOUND) ⇒ [A], FAULT_WEIGHTS.typeMix
+  const mix = FAULT_WEIGHTS.typeMix.value;
+  const types = ['SLG', 'DLG', 'LL', '3PH'] as const;
+  const wm = mix[cause === 'third-party' ? 'thirdParty' : cause === 'termination' ? 'termination' : 'insulation'];
+  const type: FaultType = rng.weighted(types, types.map((t) => wm[t]));
+  const rf = cause === 'third-party' ? rng.range(0, 0.5) : rng.range(0, 3); // [A]
   const damageReportAtMin = cause === 'third-party' && spec.damageReports && rng.next() < FAULT_WEIGHTS.damageReportProb.value ? rng.int(8, 45) : null;
   return { cable: cab.id, frac, type, rfOhm: rf, cause, damageReportAtMin };
 }

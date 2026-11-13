@@ -6,7 +6,7 @@
 ### لعبة واقعية ثنائية اللغة لتشغيل شبكات التوزيع: حدِّد العطل، وحافظ على السلامة، وأعِد الكهرباء لكل مشترك.
 
 [![CI](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml/badge.svg?branch=claude/new-session-k41b2n)](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-41%20unit%2Fgolden%20%2B%2015%20e2e-brightgreen)
+![Tests](https://img.shields.io/badge/tests-47%20unit%2Fgolden%2Fproperty%20%2B%2015%20e2e-brightgreen)
 ![Physics](https://img.shields.io/badge/physics-validated%20against%20published%20references-blue)
 ![Languages](https://img.shields.io/badge/languages-العربية%20%7C%20English-orange)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)

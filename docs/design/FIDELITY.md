@@ -1,92 +1,49 @@
 # FIDELITY CONTRACT
 
-_Status: v2 (after design review REVIEW-phase3.md; v1 scope per D-011). Owner: Physics & Domain Accuracy. Every simplification carries an ID `S-Fx-nn` mirrored in the in-game Model notes (QC checks coverage both ways)._
-_Labels: **[V]** verified source, **[S]** snippet/secondary, **[D]** derived by us, **[A]** game assumption (no public source; shown as such in-game)._
+_Status: v3 (after release review `docs/qc/REVIEW-release1-physics-safety.md`). Owner: Physics & Domain Accuracy._
+_Every simplification has an ID `S-Fx-nn`; the in-game Model notes (`src/ui/notes.ts`) carry the same IDs, and `scripts/check_sources.mjs` checks coverage both ways in CI._
+_Labels: **[V]** verified primary · **[Vsec]** faithful secondary · **[D]** derived by us · **[A]** assumption (shown in-game)._
+_Validation lines say **implemented** (test file named) or **planned**._
 
-For each phenomenon: **what** is modelled · **method** · **simplified (and why)** · **validation & tolerance**.
-
----
-
-## F1. Network & power flow (steady state)
-
-- **What:** bus voltages (magnitude/angle), branch currents, loading % of rating, losses, energised/de-energised state of every customer group.
-- **Method:** balanced positive-sequence; current-injection fixed-point on the bus admittance matrix (Y-bus, complex dense LU factorised once per topology), ZIP loads (default constant-power for steady state, constant-impedance during cold-start transients is not modelled). Source = grid-station 13.8 kV busbar as a slack with voltage set-point (default 1.0 pu). Works for radial and (briefly) meshed islands.
-- **Simplified:** no phase unbalance (SEC MV backbone is three-phase three-wire feeding balanced transformer loads [KSA-05]; single-phase effects only matter at LV [PF §5]); no OLTC dynamics in v1 (fixed source voltage per scenario); no line charging in power flow (13.8 kV cables of a few km: charging current ≈ 2.5 A/km [SP2] ≪ load current — kept in zero-sequence for earth faults, see F2).
-- **Validation:** Baran & Wu 33-bus (D-005): losses 202.68 kW ±0.1 %, Vmin 0.91309 pu ±1e-4 at bus 18 [PF-C1/13]; 69-bus losses 224.99 kW ±0.2 % [PF-15]; property tests (power balance 1e-6 pu; same seed → identical hash).
+## F1. Power flow
+- **Method:** balanced positive-sequence current-injection fixed point on the bus admittance matrix per energised island (dense complex LU, `src/engine/powerflow.ts`). Constant-power loads.
+- **Simplifications:** S-F1-01 balanced (no phase unbalance); S-F1-02 fixed source voltage, no OLTC, cable charging neglected in power flow; S-F1-03 loads constant-power in steady state (no ZIP mix in v1).
+- **Validation (implemented):** 33-bus MATPOWER variant, losses 202.677 kW ±0.1 %, Vmin 0.91309 pu @ bus 18 ±1e-4 (`tests/golden/powerflow-33bus.test.ts`); power-balance and voltage-monotonicity properties on 210 generated networks (`tests/property/physics.test.ts`). **Planned:** 69-bus case.
 
 ## F2. Short circuit
+- **Method:** IEC 60909 equivalent voltage source c·Un/√3 (c = 1.10 max, 1.00 otherwise), sequence networks with Z2 = Z1; Dyn11 distribution transformers omitted for MV faults (zero sequence blocked, no source behind); earthing solid / resistance (3Rn in Z0) / isolated; cable C0 (π, zero sequence); lumped rest-of-busbar C0; κ = 1.02 + 0.98·e^(−3R/X) for ip (`src/engine/shortcircuit.ts`).
+- **Simplifications:** S-F2-01 loads and motors neglected, far from generators, no DC-offset evolution, no Petersen-coil earthing; S-F2-02 screen-return Z0 with screen resistance borrowed from a comparable cable [A]; S-F2-03 fault resistance seeded 0–3 Ω (insulation) / 0–0.5 Ω (excavation) [A]; S-F2-04 fault-type mix (SLG/DLG/LL/3PH by cause) is an assumption — UG-cable shares not found [A]; S-F2-05 rest-of-busbar capacitance = 10 feeders × 6 km × 273 nF/km [A]; S-F2-06 grid-station source S″k 450 MVA [D], R/X 0.07 [A], Z0/Z1 = 1 [A].
+- **Validation (implemented, `tests/golden/shortcircuit.test.ts`):** Glover 9.2–9.5 ±0.05 %; CT18 §4.1 ±1.5 % (rounded source); CT158 §2.4 ±1 %; CT18 §4.3 NER + C0 ±1 %; NER example R2-A ±0.5 %. Properties (`tests/property/physics.test.ts`): non-increasing with fault resistance; ≤ c_max bolted value of the same type; I_SLG ≤ I_3PH where |Z0| ≥ |Z1|; generated networks below the 21 kA rating. **Planned:** CT158 §3.5 network case.
 
-- **What:** for 3-ph, LL, SLG, DLG faults with fault resistance at any bus or cable midpoint: fault current, sequence & phase currents in every branch, phase voltages, residual current 3I0 seen by each CT/FPI.
-- **Method:** IEC 60909-0 equivalent voltage source at the fault location, c = 1.10 (max) / 1.00 (min) at MV [N-03]; network feeder impedance from S''kQ and R/X; sequence networks with Z2 = Z1; transformer Dyn11: zero-sequence open on delta side, Z0 = ZT + 3Zn on star side [Z-01..05]; earthing as network parameter (solid, resistance Rn, isolated); cable zero-sequence impedance and shunt capacitance C0 per km (screen-return model R0 ≈ R + 3·R_screen [SP2]); peak current ip = κ·√2·I''k with κ = 1.02 + 0.98·e^(−3R/X) [N-08] (computed with deterministic exp).
-- **Also:** a lumped "rest of busbar" zero-sequence capacitance per grid-station bus **[A]** (feeders outside the modelled district: count × typical length × C0) (D3-17).
-- **Simplified:** far-from-generator faults (I''k = Ib = Ik) [N-09]; load currents neglected during fault (standard IEC 60909 assumption); KT transformer correction applied in max case only (uncertainty noted [02 open q.2]); no motor contribution; no DC-offset time evolution (ip only); no arc dynamics; Petersen-coil earthing not offered in v1 (not SEC practice per allowed methods [KSA-05/06]).
-- **Validation:** Glover/Sarma/Overbye Ex. 9.2–9.5 (all four fault types, ±0.5 %); Schneider CT158 §2.4 (6,415 A, ±1 %), §3.5 (±0.5 % with c = 1.1); CT18 §4.1 (±1 %), §4.3 NER + capacitance (≈32+j3 A, ±1 %); round-2 NER example 11 kV 15.9 Ω → 399 A (±0.5 %, low-authority source); properties: every fault current ≤ the c_max bolted value of the same fault type; magnitude non-increasing with fault resistance; I_SLG ≤ I_3ph only where Z0 ≥ Z1 at the fault point (near a solidly earthed source with Z0 < Z1, I_SLG > I_3ph is correct physics, D3-10); equipment rating (21 kA 1 s) checked against max(I_3ph, I_SLG, I_DLG).
+## F3. Protection and detection
+- **Method:** feeder-breaker phase and earth IDMT/DT elements, `t = TMS·(k/(M^α − 1) + c)`, IEC 60255-151 and IEEE C37.112 constants, cap at 20×, travel integral across reschedules, instantaneous reset; breaker opening 60 ms [A] (`src/engine/protection.ts`, `sim.ts`). FPIs flag when the current through the sensor (phase for three-phase types, residual 3I₀ for all) exceeds pickup; latch; reset on voltage return.
+- **Simplifications:** S-F3-01 ideal relays (no tolerance), instantaneous reset, 60 ms breaker [A]; S-F3-02 tee-off fuses are not simulated (no sourced time–current curves) and transformer faults are excluded; S-F3-03 FPI thresholds phase 400 A / earth 60 A [A within vendor ranges], reset on voltage return only (no timer, no minimum-duration logic), stale FPIs possible on Hard [A]; S-F3-04 feeder relay settings (IEC SI, phase 400 A TMS 0.1, earth 150 A TMS 0.1) are assumptions chosen above full-ring backfeed current; S-F3-05 earth-only FPIs cannot see faults without residual current and are never trusted for negative indication [OP-05 §11.3]; S-F3-06 FPI sensing current omits the half-shunt of its own cable end (small at < 3 A/km) [D].
+- **Validation (implemented):** 35 curve points, ABB grading (1.00 s at 4×, TMS 0.201), Chakrabarti ±6 % (`tests/golden/protection.test.ts`); operate time non-increasing with current (property); FPI indication pattern on 30 generated faults (`tests/property/physics.test.ts`). **Planned:** NPAG-derived 11 kV grading example; IEEE reset model.
 
-## F3. Protection & detection
-
-- **v1 scope (D-011):** IEC curves + DT/instantaneous at the source CB; FPIs (tee-off fuses present as rated parts only; fuse operation not simulated — no sourced curves). IEEE curves/reset, CT saturation and self-powered relay limits are v1.x.
-- **What:** phase and earth overcurrent relays (IDMT, definite time, instantaneous) at grid-station feeder breakers; (v1.x) fuse-switch combinations for transformer tee-offs; FPIs on RMU ring cables; auto-reclose disabled on cable feeders.
-- **Method:** `t = TMS·(k/(M^α − 1) + c)` with IEC 60255-151 constants SI 0.14/0.02, VI 13.5/1, EI 80/2, LTI 120/1 and IEEE C37.112 MI/VI/EI (A, B, p) [PR]; travel integral ∫dt/t(M) for changing current, IEEE reset TR/(M²−1), IEC instant/DT reset; cap at 20× pickup; breaker opening time added (default 60 ms [A]); (v1.x, once fuse time-current curves are sourced: fuses as tabulated min-melt/total-clear curves with transfer-current logic per IEC 62271-105 [SP2-51..53]); FPI pickup on phase and residual current *through the sensor* including capacitive contribution of downstream cable on external earth faults [P-03/04], latch until reset (timer / voltage return / manual).
-- **Simplified:** CT saturation as a flag (delayed operation when I > ALF·In) rather than waveform simulation; no relay pickup/time tolerance in v1 (ideal relay); no 2nd-harmonic inrush restraint modelled — cold-load/inrush only as a scripted pickup-current multiplier [A]; self-powered relay minimum operating current as a parameter [A].
-- **Validation:** curve points (IEC SI at 2× = 10.03 s, 10× = 2.97 s; all curves at M = 2,5,10,20 from verified constants, ±0.1 %); ABB grading examples (150 ms DT, 360 ms IDMT margins) [PR]; NPAG-derived 11 kV grading (fault currents 8,759 / 2,201 / 8,301 / 5,248 A, ±1 %) [SP2]; property: operate time non-increasing with current, no trip below pickup.
-
-## F4. Thermal & ageing  _(transformer thermal: v1.x / Heatwave mode — D-011; cable steady rating and I²t checks: v1)_
-
-- **What:** distribution transformer top-oil and hot-spot temperatures, ageing rate and loss of life; cable loading vs derated ampacity; cable and switchgear short-time (I²t) withstand.
-- **Method:** IEC 60076-7:2005 difference equations (C.6–C.11, via IS 2026-7; the 2018 edition was not read) with exponents/time constants x 0.8, y 1.6, τo 180 min, τw 4 min, k11 1, k21 1, k22 2 [TH-02] and **SEC parameters** Δθor 45 K, Δθhr 18 K [D from hot-spot 98 °C at 35 °C design temperature], R by size from SEC max losses (6.2 / 6.3 / 8.2 / 8.2 for 300/500/1000/1500 kVA) [T12-01] (D-009); kiosk ambient correction per Table 6 [TH-02]; ageing V = 2^((θh−98)/6) (Kraft) or the TUP formula [TH-02]; Δt ≤ 2 min sub-stepping. Cable steady ampacity = base × ground-temperature × soil-resistivity × depth × grouping factors from the Saudi Cable Company catalogue [AS2-13] (base ratings from SEC DPS: 300 A at 35 °C/2.0 K·m/W/1.0 m [KSA-02]); adiabatic checks I²t ≤ k²S² for **conductor** (k_Cu 143, k_Al 94 [TH-11]) and **metallic screen** (screen 1-s rating from NKT datasheet, e.g. 7.0 kA for 3×240/50 [SP2]) — screen overheating on solid-earthed SLG faults is a damage event; switchgear short-time rating 21 kA 1 s [KSA-07]. Switchgear ambient derating above 40 °C: **NOT FOUND** from a generic/SEC source (only one vendor table, RM6, 630 A unit) → not modelled in v1 (D3-19). Screen data taken from NKT 3×240/50 Al-wire construction and applied to the SEC 3×300 Al cable **[A]** (borrowed construction).
-- **Simplified:** no cable thermal dynamics (steady rating only — time constants NOT FOUND); no soil dry-out; transformer parameters generic ONAN, not SEC type-test data; solar gain on kiosks not modelled beyond Table 6 correction.
-- **Validation:** method — IEC 60076-7 Annex C 41-step example (±0.15 K, loss of life 6.15 days ±1 %) and Annex E (θh 114.2 °C ±0.2 K) run with *their* parameters; ageing table points (V(110) = 4.0); Saudi parameters — steady state at K = 1, θa = 35 °C ⇒ θh = 98 °C, V = 1 (exact by construction); **SEC emergency-loading check** (one-sided): from equilibrium at 75 % load, 133 % keeps θh ≤ 140 °C for ≥ 240 min at 30 °C and ≥ 155 min at 40 °C; 150 % for ≥ 98 / 65 min [T12-d]; SCC↔DPS cable rating consistency 293 vs 300 A [D].
+## F4. Thermal
+- **v1:** cable steady rating 300 A (35 °C ground) / 278 A (40 °C) [V/D]; conductor adiabatic check I²t ≤ (k·S)², k = 94 for Al XLPE [D from IEC 60949 constants]; screen 1-s rating 7.0 kA [A borrowed]; switchgear 21 kA 1 s rating check (`sim.ts`).
+- **Simplifications:** S-F4-01 steady rating only, no thermal time constants (not found), overload reported as minutes above rating; S-F4-02 borrowed screen rating; S-F4-03 switchgear ambient derating not modelled (no generic source above 40 °C).
+- **Planned (Heatwave mode):** IEC 60076-7:2005 transformer model with SEC 51-SDMS-04 parameters; IEC 60076-7:2018 not read (S-F9-01).
 
 ## F5. Loads
+- **Method:** per-substation peak load scaled to the difficulty's half-ring loading target; summer daily shape with the sourced peak window; winter factor; cold-load pickup multiplier on loads restored after ≥ 20 min.
+- **Simplifications:** S-F5-01 customers per substation, transformer loading, daily shape between sourced peak hours, winter factor and cold-load pickup ×1.5 decaying over 30 min are assumptions.
+- **Validation (implemented):** generated networks inside the 13.1–14.5 kV band and within loading targets (`tests/property/nightshift.test.ts`).
 
-- **What:** customers and demand per package substation; daily load shape (Riyadh summer/winter); demand factors.
-- **Method:** customers per substation from SEC average (~16 customers per distribution transformer nationally [D, KSA-13]) scaled by size; demand factors (residential 0.5, commercial 0.6…) [KSA-02]; summer peak mid-afternoon with AC share ~60 % [KSA-22/37, medium confidence]; annual load factor 0.46 [KSA-02].
-- **Simplified:** hourly shape is a smooth parametric curve fitted to the described peak timing, labelled [A] where it goes beyond sources; cold-load pickup after long outages as a decaying multiplier [A] (magnitude not sourced).
-- **Validation:** sanity properties (peak hour in 13:00–17:00 summer; daily load factor in plausible band); no published Riyadh 15-min profile found.
+## F6. Operations and safety
+- **Rules:** SSEN practice [OP-05/06]: halve by customers, reclose from the source, backfeed via the NOP, re-energisation delays (5 min 22:00–06:00, 20 min otherwise) as a parameterised UK example rule-set; auto-reclose off on cable feeders; crews must be clear of the circuit's substations; damage reports block re-energising the section until the site is attended; interlocks per panel only; secure (lock & tag) → **test for absence of voltage** → earth → permit → repair; no paralleling of grid stations.
+- **Trial closes** onto sections not proven healthy are allowed only from the source breaker or a remote-controlled switch, through the checklist. Proof of health comes from FPI evidence (positive from any FPI, negative only from three-phase FPIs), from successful energisation, from trial-close trips that confine the fault, or from an attended damage site.
+- **Simplifications:** S-F6-01 operating rules are UK DNO practice, not SEC (not public); S-F6-02 interlocks per panel, remote end protected by procedure (permit block); S-F6-03 crew dispatch 10 min, 40/25 km/h night/day × 1.4 road factor, manual operation 5 min, voltage test 3 min, repair 4–8 h [A]; S-F6-04 no paralleling (break-before-make) [A], duty counts CB 10 trips / LBS 2 fault makes [A]; S-F6-05 not modelled: fault-level reduction before reclosing, multiple permits per section, any live work; S-F6-06 the checklist is a single confirmation, with every condition verified by the engine; S-F6-07 trial-close trips confine the fault under a single-fault assumption, and an attended damage site is taken as the fault location; S-F6-08 backfeed is checked against cable rating and the 13.1–14.5 kV service band (DPS 1.5 % MV allocation shown as a planning reference only).
+- **Validation (implemented):** reference bot completes 120/120 generated shifts with no star-removing event; replay determinism (`tests/property/nightshift.test.ts`); e2e checklist flow (`tests/e2e/app.spec.ts`).
 
-## F6. Operations, crews & safety rules
+## F7. Reliability metrics
+- **Method:** interruption log per customer group; Ofgem (≥ 3 min; restorations < 3 min ignored) and IEEE 1366 (> 5 min) conventions.
+- **Simplifications:** S-F7-01 both conventions computed from the same log; scenario-level CML only (no system SAIDI display in v1).
+- **Validation (implemented):** Ofgem 34-min example; 63,000 customer-min staged example; 3/5-min threshold edge (`tests/golden/reliability.test.ts`).
 
-- **What:** remote (SCADA) vs manual switching, crew dispatch & travel, re-energisation delays, staff exclusion, switchgear fault-make duty, earthing of isolated sections, switching log.
-- **Method:** event-driven; remote-controlled switches operate in < 1 min [OP-04]; manual operations need a crew on site. Fault-switching rules follow documented UK DNO practice (SSEN): halve by customer count, reclose from original source, backfeed via NOP after capacity check, re-energisation delay 5 min at night / 20 min by day unless FPI/automation evidence [OP-05/06]; auto-reclose disabled on cable feeders [OP-05, SP2].
-- **Interlocks are per panel only** (IEC 62271-200 [07 §3.5]); remote-end protection is procedural: secured isolation points (lock, caution notice, remote control inhibited), earths and permits. Closing any switch bounding a section with an applied earth or open permit is blocked as a **safety-rule/permit block** (D3-08).
-- **Damage reports:** a section with an unattended damage report cannot be re-energised (SSEN: damaged network disconnected before the site is visited; injury report overrides restoration [OP-06 §12.2]) (D3-12).
-- **Switching device duty:** CB fault-operation count and LBS short-circuit making operations are parameters **[A]** (IEC 62271-103 making classes not sourced, D3-13); CB trial close preferred [OP-05 §13.18]; one further reclose after inspection [OP-10 §9.9] prevents soft-lock.
-- **Paralleling grid stations:** forbidden by default **[A]** (break-before-make), D3-16.
-- **Rule-set simplifications (stated in Model notes):** SSEN's "reduce fault level before reclosing where busbar > 150 MVA at 11 kV" [OP-06 §9.1] is not modelled (D3-18).
-- **Hard safety gates (D-008, checklist per GDD §3.5):** any re-energisation of a section that may contain the fault requires (1) the rule-set delay elapsed or positive evidence (FPI/automation) that it is healthy, (2) all crews clear of that circuit's substations, (3) switchgear fault-make duty remaining, (4) the engine-verified pre-switching checklist (justification selected and checked, named crews confirmed clear, remaining duty shown; wrong justification refused) — not a click-through confirmation. The UK 5 min (22:00–06:00) / 20 min (06:00–22:00) windows are the default **"UK DNO example rule-set"** [OP-06]; the windows are parameters and are not presented as Saudi practice.
-- **FPI type per RMU:** earth-fault-only (SEC DPS 2004: RMUs "equipped with earth fault indicator" [V per review]) or three-phase; earth-only indicators give no indication for phase-to-phase faults and are never trusted for negative indication [OP-05 §11.3].
-- **Backfeed checks:** power flow gives loading and **voltage drop** on the backfed ring; the emergency check is the **MV service band 13.1–14.5 kV** [V, KSA-02/04]; DPS's 1.5 % MV allocation is shown only as the planning reference (D3-14); cold-load pickup multiplier on re-energised load **[A]** (magnitude not sourced).
-- **Simplified / assumptions [A]:** crew travel time = route distance / speed (night 40 km/h, day 25 km/h) + dispatch 10 min; manual RMU operation 5 min on site; repair of a cable fault 4–8 h (seeded). **No public Riyadh data was found for any of these** [OP §4]; all shown as assumptions and adjustable.
-- **Validation:** rule tests (cannot re-energise before delay without evidence; cannot close a switch bounding a section with an applied earth or open permit — **permit block** (interlocks only within one panel); cannot operate the faulted section's switches while staff not excluded…).
+## F8. Saudi network parameters
+See `src/data/params.ts` (each value with label and source IDs, shown in the in-game Model notes table). Key items: 60 Hz [V]; 13.8 kV, 13.1–14.5 kV band [V]; open loop between grid stations, ≤ 50 % loading, indicative ≤ 7.5 km [V]; 3×300 Al XLPE (R_DC20 0.100, R 0.130, X 0.108 Ω/km) [V table, D interpretation]; package substations 500/1000/1500 kVA Dyn11, Z 5/6 %, SEC max losses [V T12-01].
+- **Simplifications:** S-F8-01 MV earthing default low-resistance 1000 A [A] (SEC allows solid or resistance; Riyadh practice not public).
 
-## F7. Reliability metrics & scoring
-
-- **What:** customer interruptions (CI), customer minutes lost (CML), SAIFI, SAIDI, CAIDI, MAIFI for the scenario and as a contribution to a notional system.
-- **Method:** event log of every customer group on/off with timestamps; Ofgem convention (≥ 3 min sustained; restorations < 3 min ignored) and IEEE 1366 convention (> 5 min sustained) selectable; default display uses both [OP-01/02/03].
-- **Validation:** Ofgem worked example (2 off, 2 on, 30 off ⇒ 34 min) exact; constructed night-fault example (63,000 customer-min, CAIDI 105 min) exact; DOE FLISR percentage arithmetic exact.
-
-## F8. Saudi network parameters (data, not a model)
-
-| Parameter | Value | Label |
-|---|---|---|
-| Frequency | 60 Hz; normal 59.9–60.1 Hz | [V] KSA-03/04, K2 |
-| MV | 13.8 kV, 3-wire; service band 13.1–14.5 kV | [V] KSA-02/04 |
-| Ring | open loop between two grid stations, NOP at an RMU; ≤ 50 % loading; ≤ 7.5 km to NOP | [V] DPS 2004 |
-| Grid station | 132/13.8 kV, 3 × 67 MVA | [S] (132/13.8 well attested; 67 MVA snippet) |
-| 13.8 kV fault level | equipment 21 kA 1 s; planning cap 20 kA | [V] |
-| Cable | 3×300 Al XLPE 300 A (35 °C, 2.0 K·m/W, 1.0 m); R_DC20 0.100 (max fault), R 0.130 (operating; losses, min fault), X 0.108 Ω/km (60 Hz) | [V] DPS 2004 table; column interpretation [D] |
-| Substation | package unit 500/1000/1500 kVA, 13.8/0.4 kV Dyn11, Z 5 % (500) / 6 % (1000, 1500), ONAN, rises 45/50 K, hot-spot 98 °C | [V] T12-01 (SEC 51-SDMS-04 Rev.02) |
-| RMU | 2 × 400 A LBS + 1 tee-off (fuse-switch or CB), EFI, 21 kA 1 s | [V] |
-| MV earthing | low-resistance (default **[A]**, NER limiting earth fault to 1000 A) or solid | both allowed by SEC [V]; NERs purchased (57-SDMS-01) [V] but a filled 13.8 kV schedule reads "Solidly" [V] — default is an assumption; **1000 A is [A]** (within 100–2000 A range [E-03]) |
-| FPI | type earth-only (default) or three-phase; thresholds phase 400 A, earth 60 A; inrush restraint time 100 ms [A] | type [V, DPS 2004]; ranges [V vendor, P-05, SP2]; chosen values [A] |
-| Grid transformer & earthing | 132/13.8 kV, YNyn0(d) with NER on 13.8 kV star point [S, K2 snippet]; Z0 of source = Z1 (z0OverZ1 = 1) [A] + 3·Rn | [S]/[A] |
-| Source-CB relay | phase IEC SI, pickup ≥ 1.3 × full-ring backfeed current (so backfeed does not trip it), TMS **[A]** (no fuse curves sourced, so not graded against fuses in v1; chosen so the CB clears ring faults in ≤ 1 s at the minimum fault level); earth IEC SI, pickup 10–20 % of NER limit [SP2, GT-R2-A practice]; instantaneous none | practice [V-sec]; values [A] |
-| Tee-off fuses | rating chosen inside the SIBA 15–17.5 kV Type C ranges: 500 kVA → 31.5–63 A (game: 50 A), 1000 kVA → 63–100 A (game: 80 A), 1500 kVA → between the 1250 kVA (100 A) and 1600 kVA (125 A) rows (game: 125 A [D]) [V vendor, SP2-54]; chosen values [A]. **No fuse time-current curves were sourced → fuse operation is not simulated in v1; transformer tee-off faults are excluded from the v1 fault catalogue** (D-011) |
-| Switchgear duty | CB fault trips before inspection: 10 [A]; LBS short-circuit makes: 2 [A] (E2-class-like, not sourced) | [A] |
-| Rest-of-bus C0 | 10 other feeders × 6 km × 0.75 A/km-equivalent capacitance [A] | [A] using SP2-02 per-km data |
-| Ambient | summer air 43 °C mean daily max (July), extreme 50 °C; design 55 °C | [V] |
-| Harmonics (for later PQ mode) | 13.8 kV THD 4.0 % | [V] K2 |
-
-## F9. Not modelled in v1 (stated in Model notes)
-
-IEC 60076-7:2018 changes (not read); cable thermal dynamics; three-phase unbalance and LV networks; electromagnetic transients (lightning, switching surges, ferroresonance, current chopping); arcing-fault physics; IEEE 1584 arc-flash energy (equations not public — only a labelled proxy may appear as explanation); protection relay tolerances; CT waveform saturation; OLTC/voltage regulation dynamics; generator dynamics (frequency mode later uses a single-bus swing equation); real geographic Riyadh data.
+## F9. Not in v1
+S-F9-01: transformer thermal ageing (Heatwave mode; IEC 60076-7:2018 not read), IEEE reset, CT saturation, transients and ferroresonance, arc-flash energy, arcing-fault physics, generator dynamics, three-phase unbalance and LV networks, real Riyadh geography (layout is schematic).

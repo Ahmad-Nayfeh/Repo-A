@@ -156,12 +156,13 @@ function SitePanel({ s, sel, run, engineer }: { s: GameSession; sel: Selection; 
         {(site.kind === 'gs' ? sim.net.switches.filter((x) => x.kind === 'CB' && x.site === site.id) : switches).map((sw) => (
           <li key={sw.id}>
             <div><b>{swName(s, sw)}</b> <code>{sw.id}</code></div>
-            <div class="state">{sw.closed ? `■ ${t('closed')}` : `□ ${t('open')}`}{ring?.nop === sw.id ? ` · ${t('nop')}` : ''}{sw.earthed ? ` · ⏚ ${t('earthed')}` : ''}{sim.secured.has(sw.id) ? ` · 🔒 ${t('secured')}` : ''} · <span class="muted">{t('dutyLeft', { n: sw.faultMakeLeft })}</span></div>
+            <div class="state">{sw.closed ? `■ ${t('closed')}` : `□ ${t('open')}`}{ring?.nop === sw.id ? ` · ${t('nop')}` : ''}{sw.earthed ? ` · ⏚ ${t('earthed')}` : ''}{sim.secured.has(sw.id) ? ` · 🔒 ${t('secured')}` : ''}{sim.provedDead.has(sw.id) && !sw.earthed ? ` · ✓ ${t('provedDead')}` : ''} · <span class="muted">{t('dutyLeft', { n: sw.faultMakeLeft })}</span></div>
             <div class="btns">
               {opBtn(sw, sw.closed ? 'open' : 'close')}
               {sw.kind === 'LBS' && crewsHere.map((c) => [
                 !sw.closed && !sim.secured.has(sw.id) && <button key={`s${c.id}`} onClick={() => run({ kind: 'secure', crew: c.id, switch: sw.id })}>{t('actSecure')}</button>,
-                sim.secured.has(sw.id) && !sw.earthed && <button key={`e${c.id}`} onClick={() => run({ kind: 'earth', crew: c.id, switch: sw.id, on: true })}>{t('actEarthOn')}</button>,
+                sim.secured.has(sw.id) && !sw.earthed && !sim.provedDead.has(sw.id) && <button key={`p${c.id}`} onClick={() => run({ kind: 'proveDead', crew: c.id, switch: sw.id })}>{t('actProveDead')}</button>,
+                sim.secured.has(sw.id) && !sw.earthed && sim.provedDead.has(sw.id) && <button key={`e${c.id}`} onClick={() => run({ kind: 'earth', crew: c.id, switch: sw.id, on: true })}>{t('actEarthOn')}</button>,
                 sw.earthed && <button key={`x${c.id}`} onClick={() => run({ kind: 'earth', crew: c.id, switch: sw.id, on: false })}>{t('actEarthOff')}</button>,
                 sim.secured.has(sw.id) && !sw.earthed && <button key={`u${c.id}`} onClick={() => run({ kind: 'secure', crew: c.id, switch: sw.id, on: false })}>{t('actUnsecure')}</button>,
               ])}
@@ -266,6 +267,7 @@ function LogPanel({ s }: { s: GameSession }) {
       else if (k === 'crew') out[k] = Number(v) + 1;
       else if (k === 'reason') out[k] = t(`blk_${v}`) !== `blk_${v}` ? t(`blk_${v}`, {}) : String(v);
       else if (k === 'element') out[k] = v === 'phase' ? t('elementPhase') : t('elementEarth');
+      else if (k === 'live') out[k] = v ? t('liveYes') : t('liveNo');
       else out[k] = typeof v === 'boolean' ? String(v) : v;
     }
     return out;

@@ -144,8 +144,8 @@ export function About({ go }: { go: (h: string) => void }) {
       <button class="ghost" onClick={() => go('#/')}>← {t('back')}</button>
       <h1>{t('about')}</h1>
       <p>{lang.value === 'ar'
-        ? 'لعبة مجانية ومفتوحة المصدر عن تشغيل شبكات التوزيع. محركها الفيزيائي (سريان القدرة، تيارات القصر، الحماية، مؤشرات مرور العطل، مؤشرات الموثوقية) مُتحقَّق منه مقابل أمثلة منشورة. لا تستخدم أي بيانات خاصة؛ كل قيمة لها مصدر عام أو موسومة كافتراض.'
-        : 'A free, open-source game about running distribution networks. Its engine (power flow, short circuit, protection, fault indicators, reliability indices) is validated against published examples. No proprietary data is used; every value has a public source or is labelled as an assumption.'}</p>
+        ? 'لعبة مجانية ومفتوحة المصدر عن تشغيل شبكات التوزيع. سريان القدرة وتيارات القصر ومنحنيات الحماية ومؤشرات الموثوقية في محركها مُتحقَّق منها مقابل أمثلة منشورة، ومنطق مؤشرات مرور العطل مُختبَر مقابل قاعدة التأشير الموثقة. لا تستخدم أي بيانات خاصة؛ كل قيمة لها مصدر عام أو موسومة كافتراض.'
+        : 'A free, open-source game about running distribution networks. Its power flow, short-circuit, relay-curve and reliability-index models are validated against published examples; the fault-indicator logic is tested against the documented indication rule. No proprietary data is used; every value has a public source or is labelled as an assumption.'}</p>
       <ul>
         <li><a href={`${REPO}/research/SYNTHESIS.md`} target="_blank" rel="noopener">Research synthesis</a></li>
         <li><a href={`${REPO}/research/SOURCES.md`} target="_blank" rel="noopener">Sources (bibliography)</a></li>

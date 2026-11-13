@@ -29,6 +29,8 @@ export const SOURCE = {
   z0OverZ1: p(1.0, 'A', '', 'source-z0'),
   nerCurrentA: p(1000, 'A', 'E-03 range 100–2000 A', 'ner'),
   vSetPu: p(1.0, 'A', ''),
+  // other feeders on the busbar: 10 feeders × 6 km × 273 nF/km (D3-17) ⇒ ≈ 150 A capacitive earth-fault contribution
+  restC0nF: p(10 * 6 * 273, 'A', 'SP2-02 per-km data; feeder count/length assumed', 'rest-c0'),
 };
 
 /** 3×300 mm² Al XLPE, individually screened cores [A], 13.8 kV. */
@@ -46,7 +48,7 @@ export const CABLE_3x300AL: CableType & { ampacity40C: number } = {
   c0nF: 273,
   ampacityA: 300,       // 35 °C ground, 2.0 K·m/W, 1.0 m [V] KSA-02
   ampacity40C: 278,     // SCC derating cross-check at 40 °C ground [D] (review R1-19)
-  conductorK: 94,       // Al XLPE 90→250 °C, IEC 60949 constants [V] TH-11
+  conductorK: 94,       // Al XLPE 90→250 °C, derived from IEC 60949 constants [D] TH-11
   areaMm2: 300,
   screenIk1s_kA: 7.0,   // borrowed from NKT 3×240/50 datasheet [A] (D3-19)
   src: 'KSA-02, SP2-02, SP2 (NKT), TH-11, AS2-13',
@@ -126,4 +128,11 @@ export const FAULT_WEIGHTS = {
   // ≈ 50 % of MV cable failures are third-party damage [V SC-12 §3.1]
   thirdPartyShare: p(0.5, 'V', 'SC-12'),
   damageReportProb: p(0.7, 'A', '', 'damage'),
+  // UG cable fault-type shares NOT FOUND (SP2-26) ⇒ assumption. Screened cores make earth involvement dominant;
+  // a digger cutting all cores can be near-symmetrical (3PH, no residual) — only then are earth-only FPIs blind.
+  typeMix: p({
+    insulation: { SLG: 0.85, DLG: 0.15, LL: 0, '3PH': 0 },
+    thirdParty: { SLG: 0.3, DLG: 0.4, LL: 0, '3PH': 0.3 },
+    termination: { SLG: 0.5, DLG: 0.2, LL: 0.15, '3PH': 0.15 },
+  }, 'A', 'SP2-26 NOT FOUND; screened-cable reasoning (review P-01)', 'fault-mix'),
 };

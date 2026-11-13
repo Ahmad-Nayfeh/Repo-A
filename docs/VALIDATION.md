@@ -1,6 +1,6 @@
 # VALIDATION — engine results vs published references
 
-_Generated from test output on 2026-11-13 (engine version 1). Re-run with `npx vitest run` (41 tests) and `npx playwright test` (5 e2e). Every row is a passing automated test unless marked otherwise._
+_Generated from test output on 2026-11-13 (engine version 1). Re-run with `npx vitest run` (47 tests) and `npx playwright test` (5 e2e). Every row is a passing automated test unless marked otherwise._
 
 Label key: **published** = value printed in the source; **our-3-solver** = agreement of three independent solvers (ours, numpy, pandapower) on the same data (research/04 PF-C1).
 
@@ -68,6 +68,17 @@ Not yet a golden test: CT158 §3.5 (30 kV network with transformer zero-sequence
 | Reference bot finishes 40/40 seeds per difficulty (easy, normal, hard) with no star-removing event | pass (120/120) |
 | Replay determinism: same seed + recorded actions ⇒ identical state hash | pass |
 | Pre-fault networks (60 seeds): power flow converges; every MV bus within the 13.1–14.5 kV service band [KSA-02/04]; cable loading within difficulty target (+5 % generator tolerance) | pass |
+
+## 6b. Physics properties (`tests/property/physics.test.ts`, added after release review P-03)
+
+| Property | Cases | Result |
+|---|---|---|
+| Power balance: P_source = ΣP_load + losses (1e-5 MW) | 210 generated networks, random load levels | pass |
+| Voltage non-increasing from each grid station to the NOP | 210 networks | pass |
+| Fault current non-increasing with fault resistance (SLG, 3PH) | 210 random cable positions × 5 Rf | pass |
+| Every fault current ≤ c_max bolted value of the same type; I_SLG ≤ I_3PH where |Z0| ≥ |Z1|; below 21 kA rating | 210 × 4 fault types | pass |
+| Relay operate time non-increasing with current, all 7 curves | sweep 1.01×–40× | pass |
+| **FPI indication logic**: only indicators on the source→fault path flag; none flag off-path (incl. cable charging); earth-only types dark on symmetrical faults | 30 generated faults | pass |
 
 ## 7. Browser (`tests/e2e/app.spec.ts`, Playwright)
 

@@ -25,6 +25,8 @@ export interface Source {
   earthing: Earthing;
   /** zero-sequence impedance of the grid transformer(s) as a multiple of Z1 (before 3·Zn) */
   z0OverZ1: number;
+  /** lumped phase-earth capacitance of other feeders on this busbar (nF), zero sequence only [A] */
+  restC0nF?: number;
 }
 
 export type Earthing =
