@@ -353,3 +353,33 @@ Phase 3 can exit once:
 3. The remaining Important findings are fixed or justified in DECISIONS before the code that depends on them is written.
 
 The research basis, labelling discipline and engine-first architecture are sound. Nothing here requires re-research except optional sources for LBS making classes (D3-13).
+
+---
+
+## H. Re-verification (2026-11-13, same reviewer; GDD v2, FIDELITY v2, ARCHITECTURE v2, docs/org, DECISIONS D-008a, D-011..D-014)
+
+- **D3-08 (Critical): RESOLVED, with stale lines.**
+  - Done: GDD §3.5 and FIDELITY F6 now say interlocks work per panel only, and add secure-isolation and permit actions with a "safety-rule / permit block".
+  - Still to fix: the FIDELITY F6 validation line still reads "cannot close onto an earthed section — interlock". Reword it to "permit block".
+- **D3-21 (Critical): RESOLVED (D-011).**
+  - The extra cut of fuse operation and tee-off faults is **acceptable**: it is honest, since no fuse time-current curves were sourced.
+  - Still to fix: FIDELITY F3 "What" still lists fuse-switch combinations, and the F8 source-CB row says "TMS by grading against fuses". With no fuse curves, the TMS must be labelled [A] (e.g. a fixed margin above transformer inrush and cold load) until curves are sourced.
+- **D3-09: REFLECTED.** GDD §3.1 and §3.6: individually screened cores are labelled [A], the fault type depends on location, and FPIs follow the computed residual and are never scripted.
+- **D3-10: REFLECTED.** The physics gate and FIDELITY F2 use the conditioned properties and check the rating against max(I_3ph, I_SLG, I_DLG). The grid-transformer vector group and earthing are added to F8.
+- **D3-11: REFLECTED in GDD §3.5 and D-008a.**
+  - Still to fix: FIDELITY F6 "Hard safety gates" item (4) still says "an explicit risk-assessment confirmation step". Replace it with "engine-verified pre-switching checklist (GDD §3.5)".
+- **D3-13: REFLECTED.** CB trial close is preferred; LBS/NOP making duty is [A]; "one reclose after inspection" prevents soft-lock.
+- **D3-14: REFLECTED.** Emergency check uses the 13.1–14.5 kV service band; Hard is labelled "stressed beyond planning rule" [A]; cold-load sensitivity is shown; the transformer-ageing claim is removed.
+- **D3-23: REFLECTED; dense LU acceptable.** Per-island solves, measured 0.40 ms at n = 80, and the v1 island bound of about 60–80 nodes keep it within budget. The 5 ms and 1.5 s gates are retained, with a sparse ordering path recorded. The measurement was on desktop Node; the 4×-throttle par gate will catch a mobile shortfall.
+- **D3-24: REFLECTED, but weak wording.** "Firefox/WebKit … where those browsers are installed" lets the check silently skip. Make installing them (`npx playwright install firefox webkit`) a required CI step, so the gate cannot pass vacuously.
+- **Other Important items (D3-01..05, 12, 15, 16, 22, 25, 26, 28): REFLECTED** in GDD, ARCHITECTURE and charters, and justified in D-012..D-014.
+  - New problem: game-design gate 3 measures "mastery headroom" against the **oracle**. The oracle sees the hidden fault location, so it beats par on nearly every seed, and the 20–80 % band is meaningless.
+  - Fix: use a stronger search bot restricted to `observe()` data, and keep the oracle only for regret.
+
+**Verdict: PASS.** Phase 3 may exit. Before engine code depends on them, make these four small edits:
+1. FIDELITY F6 validation line: "interlock" → "permit block".
+2. FIDELITY F6 gate (4): replace with the engine-verified checklist.
+3. Fuse leftovers in F3/F8: drop fuse-switch combinations from F3 "What"; label the source-CB TMS [A].
+4. Game-design gate 3: measure headroom with an observation-limited search bot, not the oracle.
+
+Also make Firefox/WebKit mandatory in CI.
