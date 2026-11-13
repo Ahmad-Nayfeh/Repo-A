@@ -36,3 +36,7 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 - MV earthing default: low-resistance earthed (SEC has an NER spec, 57-SDMS-01) with an assumed limit chosen in FIDELITY.md; solid earthing is selectable.
 - Operational procedure (halving by customers, backfeed via NOP, re-energisation delays, duty counts) follows documented UK DNO practice (SSEN), labelled as such, because no SEC operating manual is public.
 - Reversible: yes (data tables).
+
+## D-007 — Ten departments as gates (2026-11-13)
+- See docs/org/README.md for the list and rationale. Merged Performance into Engineering (physics cost negligible per PF benchmark); added Safety & Integrity (operational content risk); omitted marketing/community (no server).
+- Departments run as CI checks + fresh-context review subagents. Reversible: yes.
