@@ -9,4 +9,5 @@
 - Honesty: assumptions labelled in-game; no invented sources.
 - D-004: no alfanar-derived values.
 
-**Quality gate:** a fresh-agent safety review of all in-game text and procedures for each release (`docs/qc/SAFETY-<date>.md`) with 0 open findings; grep check for excluded source IDs in `src/` = 0.
+**Quality gate:** a fresh-agent safety review of all in-game text and procedures for each release (`docs/qc/SAFETY-<date>.md`) with 0 open findings; grep check for excluded source IDs in `src/` = 0; author attestation line in every `src/data/*.ts` header ("public sources only; no employer or customer-internal data").
+- Interlocks are modelled per panel only; remote-end protection is procedural (secured isolation, earths, permits) and must be presented that way (D3-08).

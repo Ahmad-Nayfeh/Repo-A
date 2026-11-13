@@ -1,6 +1,6 @@
 # ARCHITECTURE
 
-_Status: v1 draft (Phase 3). Owner: Engineering. Reviewed by: design review (see `docs/design/REVIEW-phase3.md`)._
+_Status: v2 (after design review `docs/design/REVIEW-phase3.md`; v1 scope D-011). Owner: Engineering._
 
 ## 1. Principles
 
@@ -20,7 +20,7 @@ _Status: v1 draft (Phase 3). Owner: Engineering. Reviewed by: design review (see
 | Rendering | SVG for network diagrams; Canvas only for charts/waveforms if needed | 100–500 elements is SVG's comfortable range [GD-87]; DOM events + accessibility |
 | Tests | Vitest (unit, golden, property via fast-check), Playwright (e2e, a11y via axe-core) | free, standard |
 | Audio | Web Audio API, synthesized sounds (no asset files) | zero licence risk, tiny |
-| PWA | hand-written service worker (cache-first app shell, versioned cache) | no plugin dependency; [GD-82] pattern |
+| PWA | **v1.x** (D-011): hand-written service worker keyed by build version | [GD-82] pattern; arrives together with `/v/<n>/` builds |
 | Fonts | Noto Sans Arabic / IBM Plex Sans Arabic (OFL), self-hosted subset; system UI font for Latin | OFL verified [GD-70] |
 
 ## 3. Module layout
@@ -36,7 +36,7 @@ src/
     shortcircuit.ts  IEC 60909-style: sequence Y-buses (1,2,0 incl. earthing, C0), Thevenin at fault bus, 4 fault types, branch currents
     protection.ts    IDMT/DT/instantaneous elements (IEC & IEEE constants), travel integrals, fuses, self-powered relay limits
     fpi.ts           FPI pickup (phase / residual through sensor), latch, reset rules
-    thermal.ts       IEC 60076-7 difference equations per transformer; cable steady rating + adiabatic check
+    thermal.ts       v1: cable steady rating (derating) + conductor/screen adiabatic I²t checks; v1.x: IEC 60076-7 transformer model (Heatwave)
     loads.ts         daily load shapes (Riyadh summer/winter), customer counts, cold-load pickup factor
     events.ts        priority queue (time, seq) — the only clock
     crews.ts         crew entities, travel/operate times (assumption-flagged parameters)
@@ -85,7 +85,7 @@ Scenario(seed) ──► Network + Load profiles + Fault schedule + Crew roster
 - State-affecting code uses only `+ − × ÷`, `Math.sqrt`, comparisons, and `dmath.exp/log/pow` (our own implementations in exact ops). `Math.exp/log/pow/sin/cos/**/hypot` are forbidden in `src/engine/**` (ESLint `no-restricted-properties`). Reason: ECMAScript leaves those implementation-approximated [PF-27/28].
 - Iteration order fixed (arrays, sorted ids; never `for…in` over objects, never Map iteration of insertion-dependent hashed keys without sorting).
 - Single PRNG source with named sub-streams (`rng.stream('faults')`) so adding a new consumer doesn't shift others.
-- `sim.hash()` = FNV-1a over a canonical serialisation of state (floats via their IEEE-754 bit patterns). e2e test compares Node vs Chromium hashes after a scripted run.
+- `sim.hash()` = FNV-1a over a canonical serialisation of state (floats via their IEEE-754 bit patterns). The determinism test runs a scripted 3-scenario run (fault, trips, backfeed) and compares hashes across **Node, Chromium, Firefox and WebKit** (Playwright; Firefox/WebKit run in CI where those browsers are installed) (D3-24). `toFixed`/`Intl` are display-only.
 - Time is integer milliseconds of game time.
 
 ## 6. Modes as thin layers
@@ -102,15 +102,20 @@ interface Mode {
 }
 ```
 
+## 6b. Observation layer (D3-26)
+
+The UI never reads engine internals directly. `observe(sim, mode)` returns only what a real control room would know: SCADA states and analogues of automated sites, source-CB relay records (phases involved, magnitudes, residual), FPI flags **actually read**, crew reports, damage reports, customer-call counts. The full engine solution (where the fault is, all branch currents) is revealed only in the after-action review. Dev builds expose `window.__sim` (observe/act) so test agents and bots can play.
+
 ## 7. Sharing & persistence
 
 - **URL hash** encodes `v=<engineVersion>&m=<mode>&s=<seed>&d=<difficulty>[&a=<actions base64url>]`. Opening the URL reproduces the scenario; with `a=` it replays the run (verifiable scores, serverless).
-- **Daily:** seed = FNV-1a("YYYY-MM-DD" UTC + mode id). Share string: emoji summary + score + URL with the replay, so others can verify.
+- **Daily:** seed = FNV-1a("YYYY-MM-DD" UTC + mode id); if the reference bot cannot finish it, re-roll deterministically (seed+1…) and log. Share string: emoji summary + score + replay URL — **reproducible**, not "verifiable" (D3-07).
+- **Long-lived links (D3-25, D-013):** the Pages workflow builds every release tag into an immutable `/v/<n>/` path; a URL with `v=n` is redirected there; the root serves the latest. A model changelog explains differences.
 - **localStorage** (wrapped in try/catch): settings, language, progress, streaks, personal bests. The game works if it is unavailable.
 
-## 8. Performance budgets
+## 8. Performance budgets (revised after D3-23, measured)
 
-See `docs/org/engineering.md` gate. Expected: a district of 2 grid stations, 4–6 rings, ~60 package substations ⇒ ~130 buses; dense complex LU of 130² is ~0.7 M complex flops ⇒ ≪ 5 ms.
+Solves are **per energised island** (one grid station and the half-rings it feeds, or a backfed ring). v1 Hard district: 3 rings × ≤ 12 RMUs ⇒ the largest island ≈ 30 RMU nodes + 30 LV nodes + bus ≈ 60–80 nodes. Measured dense complex LU (Node 22/V8, desktop): n = 40 → 0.33 ms, 80 → 0.40 ms, 120 → 1.3 ms, 300 → 18 ms. Decision: **dense LU for v1** (LU skips structural zeros), kept as the oracle; a leaves-first sparse ordering is the v1.x path if districts exceed ~120 nodes per island. Gates: (1) topology change + PF + SC on the largest v1 Hard district ≤ 5 ms median in CI Chromium (no throttle); (2) par-bot computation ≤ 1.5 s with 4× CPU throttle.
 
 ## 9. Deployment
 

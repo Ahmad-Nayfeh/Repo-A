@@ -20,3 +20,5 @@ Departments are run as (a) automated checks in CI and (b) explicit review passes
 **Why these and not others** (D-007): Research showed credibility with engineers is the moat (GD-06/11), so Research & Sources and Physics are separate, strong gates. Safety gets its own gate because the operational content (switching, re-energisation, arc flash) can drift towards unsafe how-to. Performance is folded into Engineering (physics is ~0.04 ms per solve; rendering is the only budget risk). Marketing/community is omitted (no server, no accounts; out of scope for v1).
 
 **Challenge protocol:** any department can file a blocking objection against another's output in `docs/org/OBJECTIONS.md` (ID, raised by, against, evidence, resolution). Release is blocked while a Critical objection is open.
+
+**v1 process (D-012):** the ten gates are run as CI checks plus **two** independent review agents per release: (1) Physics + Safety + Research trace (incl. QC sampling), (2) Game + UX + Localisation playtest in both languages and viewports. QA's process audit checks that both ran.

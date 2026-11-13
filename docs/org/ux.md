@@ -10,4 +10,5 @@
 2. Automated a11y (axe-core via Playwright) on every screen: 0 serious/critical violations.
 3. No information conveyed by colour alone (each state has a second channel); text contrast ≥ 4.5:1.
 4. Full flagship-mode play possible by keyboard only (e2e test).
+6. Tap targets ≥ 44×44 CSS px at 390 px width (measured in e2e); every action reachable at 390 px without pinch-zoom (ring-focused phone view, D3-05).
 5. `prefers-reduced-motion` disables non-essential animation; audio starts only after user gesture and has mute.

@@ -7,6 +7,6 @@
 
 **Quality gate:**
 1. CI green: `tsc --noEmit` (strict), lint, unit + golden + property tests, build.
-2. Determinism test: identical seed + action list → identical state hash in Node and in Chromium (Playwright).
-3. Performance budgets (measured in CI with Playwright on Chromium): initial JS ≤ 250 KB gzip; first load to interactive ≤ 2.5 s on simulated mid-range mobile (Lighthouse-style CPU 4× throttling); engine step for 300-bus network ≤ 5 ms; 60 fps target / ≥ 30 fps floor when panning the diagram.
+2. Determinism test: identical seed + action list → identical state hash in Node, Chromium, Firefox and WebKit (Firefox/WebKit in CI).
+3. Performance (measured): topology change + PF + SC on the largest v1 Hard district ≤ 5 ms median (CI Chromium, no throttle); par computation ≤ 1.5 s at 4× CPU throttle; initial JS ≤ 250 KB gzip; Lighthouse LCP ≤ 2.5 s and TBT ≤ 300 ms (median of 3 runs, mobile preset) — advisory until the Lighthouse job is in CI; panning smoothness advisory (no long task > 50 ms during a scripted pan in headed Chromium).
 4. Every dependency has a permissive licence recorded; 0 paid services.

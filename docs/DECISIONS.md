@@ -55,3 +55,21 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 
 ## D-010 — Versioned seeds and links (2026-11-13, after review R1-15)
 - Every seed/share/replay carries `v=<engine+data version>`; a model changelog maps changes to source IDs; old links show a notice when replayed on a newer engine.
+
+## D-011 — v1 cut line (2026-11-13, after design review D3-21)
+- Adopted the reviewer's cut line (REVIEW-phase3.md §F) with one change: **tee-off fuse operation and transformer tee-off faults are also cut**, because no fuse time-current curves were sourced (the lead caught an unsupported "digitised curves" claim in its own FIDELITY draft).
+- Above the line (v1): dmath/PRNG; topology; per-island power flow; full SC (4 types, Zf, NER/solid, C0, rest-of-bus C0); IEC + DT source-CB protection with travel integral; FPIs (earth-only/3-ph, latch, reset, [A] reliability); conductor & screen I²t; cable steady rating 35/40 °C; CLPU [A]; crews; reliability log (Ofgem 3-min + IEEE 5-min CML); Night Shift with training (3 faded faults), daily, free play, Easy/Normal/Hard, evidence sources, safety model, end state with permit, reference bot + oracle; replay URLs; results timeline; Model notes; glossary; AR/EN; themes; keyboard; phone ring view; CI; Pages.
+- Below the line (v1.x, absent from v1 UI — not placeholders): transformer thermal (Heatwave), IEEE curves, CT saturation, self-powered relays, switchgear derating, fuse operation, tee-off faults, SAIFI/SAIDI system display, 69-bus golden, Expert, evolving/second faults, career, home district, phasor views, audio beyond one chime, PWA, paralleling, Live shift.
+- Evidence: reviewer's scope analysis; measured progress (engine core + 3 golden suites done in ~1 h).
+
+## D-012 — Two review agents per release instead of ten passes (D3-30)
+- Gates still exist; CI covers Engineering/Localisation key coverage; two independent agents cover the rest. Reversible.
+
+## D-013 — Dense LU kept for v1; versioned builds for long-lived links (D3-23, D3-25)
+- Measured LU cost (n=80: 0.40 ms) is within budget for v1 island sizes; sparse ordering deferred. Release tags build into `/v/<n>/`.
+
+## D-008a — Safety scoring clarified (D3-11)
+- Pre-switching checklist verified by the engine (not a click-through); blocked attempts are logged as near misses (no star loss); stars are removed only by events that actually happened (energising a section with an unattended damage report; exceeding switchgear duty).
+
+## D-014 — Remaining design-review findings
+- D3-01..D3-07, D3-09, D3-12..D3-20, D3-22, D3-24, D3-26..D3-29: adopted as written into GDD v2 / FIDELITY v2 / ARCHITECTURE v2 / charters. None rejected. D3-13 LBS making-class counts and D3-17 rest-of-bus C0 remain [A] pending sources.
