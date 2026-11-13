@@ -78,7 +78,7 @@ export function NetworkView({ s, selection, onSelect, ringFilter }: Props) {
               const fl = latestRead.get(`${id}-FL`), fr = latestRead.get(`${id}-FR`);
               const crewsHere = sim.crews.filter((c) => c.site === id || c.travellingTo === id);
               return (
-                <g key={id} class={`rmu ${sel ? 'sel' : ''}`} onClick={() => onSelect({ kind: 'site', id })} role="button" tabIndex={0}
+                <g key={id} data-id={id} class={`rmu ${sel ? "sel" : ""}`} onClick={() => onSelect({ kind: 'site', id })} role="button" tabIndex={0}
                   aria-label={`${t('rmu', { id })}: ${on ? t('supplyOn') : t('supplyOff')}`}
                   onKeyDown={(e) => { if (e.key === 'Enter') onSelect({ kind: 'site', id }); }}>
                   {mark(prev, L)}{mark(next, R)}
@@ -99,7 +99,7 @@ export function NetworkView({ s, selection, onSelect, ringFilter }: Props) {
         const x = g === 'GA' ? 0 : 100;
         const sel = selection?.kind === 'site' && selection.id === g;
         return (
-          <g key={g} class={`gs ${sel ? 'sel' : ''}`} onClick={() => onSelect({ kind: 'site', id: g })} role="button" tabIndex={0}
+          <g key={g} data-id={g} class={`gs ${sel ? "sel" : ""}`} onClick={() => onSelect({ kind: 'site', id: g })} role="button" tabIndex={0}
             aria-label={t('gridStation', { name: g === 'GA' ? 'A' : 'B' })} onKeyDown={(e) => { if (e.key === 'Enter') onSelect({ kind: 'site', id: g }); }}>
             <rect x={x - 5} y={-5} width="10" height="10" rx="1.5" class="gs-box" />
             <text x={x} y={1.2} class="gs-label" text-anchor="middle">{g === 'GA' ? 'A' : 'B'}</text>
