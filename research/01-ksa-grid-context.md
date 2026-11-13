@@ -326,8 +326,8 @@ The Distribution Code text itself (planning clause DPC2.1 frequency and DPC2.2 v
 | Transformer loading rule | Plan reinforcement at 80%; do not exceed 100% | High (2004) | [KSA-02] |
 | LV system | 400/230 V for new areas, TN-type with neutral solidly earthed at the transformer and multiply earthed (pole and consumer). Older districts are 220/127 V or 380/220 V. Plugs are BS 1363-type 13 A | High (voltages); medium (TN-C-S label) | [KSA-01][KSA-05][KSA-16][KSA-17] |
 | LV voltage limits (400/230 V) | 380/218.5 – 420/241.5 V | High | [KSA-01][KSA-04] |
-| Climate | Summer daytime ambient 43–46 °C typical, design 55 °C; dust storms as a random event in spring; Riyadh humidity is low (pollution flashover is a coastal mechanic, not Riyadh) | High | [KSA-01][KSA-21][KSA-23] |
-| Daily load shape | Summer peak about 13:00–17:00 (residential about 15:00); AC about 60% of summer residential load; summer peak months May–Aug | Medium (Eastern Province data, plus a Central Region snippet) | [KSA-22][KSA-37] |
+| Climate | Summer mean daily max about 43 °C (Jun–Aug), record about 49–50 °C, equipment design 55 °C; dust storms as a random event in spring; Riyadh humidity is low (pollution flashover is a coastal mechanic, not Riyadh) | High | [KSA-01][KSA-21][KSA-23] |
+| Daily load shape | Summer peak about 13:00–17:00 (residential about 15:00); AC about 60% of summer residential load; summer peak months May–July (Eastern Province data) | Medium (Eastern Province data, plus a Central Region snippet) | [KSA-22][KSA-37] |
 | Annual load factor | 0.46 | Medium (2004) | [KSA-02] |
 | Reliability target for "good" | SAIDI about 100 min/yr (2020 SEC level) improving toward under 50 min | Medium | [KSA-15][KSA-27] |
 | Demand factors | Residential 0.5, commercial 0.6–0.9 | High (2004) | [KSA-02] |
