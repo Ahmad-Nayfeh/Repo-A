@@ -295,7 +295,7 @@ Basis: air 40 °C, **ground 30 °C**, **soil 1.5 K·m/W**, **depth 0.8 m**, scre
   - Al 240 mm²: 22.7 / 13.1
   - Al 300 mm²: 28.3 / 16.4
 - **Conflict:** one search snippet gave 92 for Al. The verified catalogue gives 94.6, so 94 is used. The IEC 60364-4-43 table itself was **NOT read**.
-- The screen short-circuit rating is calculated from 80 °C initial temperature (IEC 60949) [TH-10].
+- The screen short-circuit rating is calculated from 80 °C initial temperature (IEC 60949) [TH-10 — EXCLUDED as source per D-004; the 80 °C initial-temperature rule is IEC 60949 practice, re-source before use].
 
 ### 3.5 Dynamic rating and time constants
 - IEC 60853-1 covers cyclic rating for cables up to and including 18/30(36) kV. Part 2 covers higher voltages and emergency ratings. Part 3 covers partial soil drying [TH-13]. **verified**
