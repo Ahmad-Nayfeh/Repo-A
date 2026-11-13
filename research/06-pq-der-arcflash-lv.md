@@ -357,7 +357,7 @@ Source: Mohla & Lee IEEE presentation [PQ-24, verified (secondary); the presente
 ### 7.4 GB 9 August 2019 (official ESO report) [PQ-29, verified]
 | Time | Event | Cumulative loss |
 |---|---|---|
-| 16:52:33.490 | Lightning → single (blue) phase-to-earth fault on Eaton Socon–Wymondley 400 kV circuit (≈21 kA + 7 kA infeed, ~50 % voltage depression on blue phase); cleared in **70/74 ms**; DAR re-energised it at 16:52:53. ~150 MW embedded generation trips on **vector shift** | 150 MW |
+| 16:52:33.490 | Lightning → single (blue) phase-to-earth fault on Eaton Socon–Wymondley circuit (≈21 kA + 7 kA infeed, ~50 % voltage depression on blue phase); cleared in **70/74 ms**; DAR re-energised it at 16:52:53. ~150 MW embedded generation trips on **vector shift** | 150 MW |
 | 16:52:33.5 | Hornsea offshore wind (799 MW) drops to 62 MW → **737 MW** lost | — |
 | 16:52:34 | Little Barford steam turbine trips **244 MW** | **1,131 MW** |
 | 16:52:34 | ~**350 MW** embedded gen trips on **RoCoF** (>0.125 Hz/s) | **1,481 MW** |
