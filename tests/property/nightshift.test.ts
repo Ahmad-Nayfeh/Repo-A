@@ -59,3 +59,17 @@ describe('Night Shift gates', () => {
     }
   });
 });
+
+import { CONDITIONS } from '../../src/ui/session';
+describe('daily conditions (D3-04) stay solvable', () => {
+  for (const c of CONDITIONS) {
+    it(`${c.id}: reference bot finishes 20/20 normal seeds`, () => {
+      const fails: number[] = [];
+      for (let seed = 1; seed <= 20; seed++) {
+        const r = runBot(generateScenario(seed * 104729, 'normal', c.overrides));
+        if (!r.finished || r.sim.metrics().starEvents > 0) fails.push(seed);
+      }
+      expect(fails).toEqual([]);
+    }, 120_000);
+  }
+});

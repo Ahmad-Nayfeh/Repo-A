@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks';
-import type { GameSession } from './session';
+import { dailyCondition, type GameSession } from './session';
 import { NetworkView, type Selection } from './NetworkView';
 import { RingLadder } from './RingLadder';
 import { useEffect } from 'preact/hooks';
@@ -74,6 +74,7 @@ export function Game({ s, onExit, onNext }: { s: GameSession; onExit: () => void
           <button class="primary" onClick={() => run({ kind: 'advance' })}>{t('advance')} ⏭</button>
         </div>
       </header>
+      {s.mode === 'daily' && s.date && <div class="hint" role="note">📅 {t('daily')} · <b>{t(`cond_${dailyCondition(s.date).id}`)}</b></div>}
       {hintKey && <div class="hint" role="note">💡 {t(hintKey)}</div>}
       {toast && <div class="toast" role="alert" onClick={() => setToast(null)}>{toast}</div>}
       <div class="board">

@@ -163,6 +163,7 @@ export const en = {
   grInrush: 'Transformer magnetising inrush point',
   grNote: 'Rules: pickup above load; inrush 12 × In for 100 ms (ABB); margin 0.3 s (IEEE 242 range 0.25–0.4 s); assumptions: 40 ms minimum relay time, minimum fault = line-to-line, phase elements only.',
   newBadge: 'new',
+  cond_standard: 'Standard night', cond_solid: 'Solidly earthed district', cond_heat: 'Heat: 40 °C ground, summer afternoon', cond_oneCrew: 'Only one crew on shift', cond_comms: 'SCADA comms trouble', cond_stale: 'Stale indicators around', cond_digger: 'Digger strike — damage report',
   share: 'Copy result', copied: 'Copied!', replayLink: 'Replay link', playAgain: 'Play again', nextTraining: 'Next training fault',
   starsRule: '★ shift completed safely · ★★ within 125 % of the reference strategy · ★★★ at or better than it',
   // training hints

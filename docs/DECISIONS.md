@@ -84,3 +84,6 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 - Evidence: in the v1 network model, moving normally-open points does not change transformer load (each transformer serves its own customers), so a Heatwave mode would need LV load-transfer or demand-response modelling first (D3-14 observed the same). The transformer thermal engine is built and validated (VALIDATION §3b) and waits for that.
 - Grading uses only validated parts (IEC curves, short circuit) plus sourced constraints (CTI 0.25–0.4 s, inrush 12×In 100 ms, pickup above load). Fuse curves remain unsourced, so the chain uses a breaker-type RMU tee-off (SEC 32-SDMS-04).
 - Reversible: yes.
+
+## D-017 — Condition-of-the-day rotation for the daily (2026-11-13, D3-04)
+- Seven conditions cycle by UTC day: standard, solidly earthed district, heat (40 °C ground, 15:00 summer), one crew, SCADA comms trouble, stale indicators, digger strike with damage report. Each is a generator override; every condition is gated by the reference bot finishing 20/20 seeds (tests/property/nightshift.test.ts).

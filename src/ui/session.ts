@@ -18,6 +18,21 @@ export const TRAINING: { difficulty: Difficulty; seed: number; overrides: Partia
 
 export function todayUTC(): string { return new Date().toISOString().slice(0, 10); }
 export function dailySeed(date = todayUTC()): number { return fnv1a32(`${date}|nightshift|v${ENGINE_VERSION}`); }
+
+/** Condition-of-the-day rotation (D3-04): one twist per UTC day, cycling through seven conditions. */
+export const CONDITIONS: { id: string; overrides: Partial<DifficultySpec> }[] = [
+  { id: 'standard', overrides: {} },
+  { id: 'solid', overrides: { earthing: 'solid' } },
+  { id: 'heat', overrides: { groundTemp: 40, summer: true, hour: 15 } },
+  { id: 'oneCrew', overrides: { crews: 1 } },
+  { id: 'comms', overrides: { commsLossProb: 0.5 } },
+  { id: 'stale', overrides: { staleFpiProb: 0.2 } },
+  { id: 'digger', overrides: { forceDamage: true, damageReports: true } },
+];
+export function dailyCondition(date = todayUTC()) {
+  const day = Math.floor(Date.parse(`${date}T00:00:00Z`) / 86400000);
+  return CONDITIONS[((day % CONDITIONS.length) + CONDITIONS.length) % CONDITIONS.length]!;
+}
 /** Daily condition-of-the-day: Friday hard, otherwise normal (D3-04 rotation, minimal v1). */
 export function dailyDifficulty(date = todayUTC()): Difficulty { return new Date(`${date}T00:00:00Z`).getUTCDay() === 5 ? 'hard' : 'normal'; }
 
@@ -35,7 +50,7 @@ export class GameSession {
     this.mode = opts.mode;
     this.training = opts.training ?? -1;
     this.date = opts.date ?? null;
-    const ov = this.training >= 0 ? TRAINING[this.training]!.overrides : {};
+    const ov = this.training >= 0 ? TRAINING[this.training]!.overrides : this.mode === 'daily' && this.date ? dailyCondition(this.date).overrides : {};
     this.scenario = generateScenario(opts.seed, opts.difficulty, ov);
     this.sim = new Simulation(this.scenario);
     // a replay already starts with the initial 'advance' (review G-01): never apply it twice

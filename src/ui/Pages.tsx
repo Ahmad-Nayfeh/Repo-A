@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import { t, lang, setLang, digits, setDigits, fmt } from '../i18n/i18n';
 import { SIMPLIFICATIONS } from './notes';
 import * as P from '../data/params';
-import { dailyResult, todayUTC, ENGINE_VERSION } from './session';
+import { dailyResult, todayUTC, ENGINE_VERSION, dailyCondition } from './session';
 import type { Difficulty } from '../engine/scenario/district';
 import { isMuted, setMuted } from '../audio/synth';
 import { store } from '../i18n/i18n';
@@ -26,7 +26,7 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
         <article class="card">
           <h2>{t('daily')}</h2>
           <p>{t('dailyDesc')}</p>
-          <p class="muted" dir="ltr">{todayUTC()}</p>
+          <p class="muted"><bdi dir="ltr">{todayUTC()}</bdi> · <b>{t(`cond_${dailyCondition().id}`)}</b></p>
           {daily ? <p><b>{t('dailyDone')}</b> · {'★'.repeat(daily.stars)}{'☆'.repeat(3 - daily.stars)} · {fmt(daily.cml)}</p>
             : <button class="primary" onClick={() => go('#/daily')}>{t('play')}</button>}
         </article>

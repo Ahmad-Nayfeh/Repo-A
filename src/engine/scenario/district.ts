@@ -14,6 +14,12 @@ export interface DifficultySpec {
   rings: number; rmusPerRing: [number, number]; automated: number; crews: number;
   fpiType: 'three-phase' | 'earth-only' | 'mixed'; loading: [number, number]; stressed: boolean;
   staleFpiProb: number; damageReports: boolean; commsLossProb: number; summer: boolean; hour: number | 'random';
+  /** MV neutral earthing of both grid stations (default low-resistance [A], S-F8-01) */
+  earthing?: 'resistance' | 'solid';
+  /** ground temperature for cable rating (default 35 °C; 40 °C on stressed networks) */
+  groundTemp?: 35 | 40;
+  /** force a third-party fault with a damage report */
+  forceDamage?: boolean;
 }
 
 export const DIFFICULTY: Record<Difficulty, DifficultySpec> = {
@@ -60,10 +66,10 @@ export function generateScenario(seed: number, difficulty: Difficulty, overrides
   const nerOhm = (kv * 1000) / Math.sqrt(3) / SOURCE.nerCurrentA.value;
   for (const [gs, x] of [['GA', 0], ['GB', W]] as const) {
     net.buses.push({ id: gs, kind: 'source', vnKV: kv, x, y: 0, label: gs });
-    net.sources.push({ id: `S-${gs}`, bus: gs, vSetPu: SOURCE.vSetPu.value, skMVA: SOURCE.skMVA.value, rx: SOURCE.rx.value, earthing: { kind: 'resistance', rOhm: nerOhm }, z0OverZ1: SOURCE.z0OverZ1.value, restC0nF: SOURCE.restC0nF.value });
+    net.sources.push({ id: `S-${gs}`, bus: gs, vSetPu: SOURCE.vSetPu.value, skMVA: SOURCE.skMVA.value, rx: SOURCE.rx.value, earthing: spec.earthing === 'solid' ? { kind: 'solid' } : { kind: 'resistance', rOhm: nerOhm }, z0OverZ1: SOURCE.z0OverZ1.value, restC0nF: SOURCE.restC0nF.value });
     sites.push({ id: gs, kind: 'gs', x, y: 0, label: gs === 'GA' ? 'A' : 'B', remote: true, commsOk: true });
   }
-  const groundTempC: 35 | 40 = spec.stressed ? 40 : 35;
+  const groundTempC: 35 | 40 = spec.groundTemp ?? (spec.stressed ? 40 : 35);
   const sw = (s: Omit<Switch, 'faultMakeLeft' | 'earthed'> & { faultMakeLeft?: number }): Switch => {
     const full: Switch = { faultMakeLeft: s.kind === 'CB' ? OPERATIONS.cbFaultOps.value : OPERATIONS.lbsFaultMakes.value, earthed: false, ...s };
     net.switches.push(full);
@@ -178,7 +184,7 @@ function generateFault(rng: Rng, net: Network, rings: RingInfo[], spec: Difficul
   // never on the feeder cable right at a grid station in v1 (keeps the first section restorable from the other side)
   const cand = cabs.slice(1, cabs.length - 1);
   const w = FAULT_WEIGHTS.component.value;
-  const cause = rng.next() < FAULT_WEIGHTS.thirdPartyShare.value ? 'third-party' : rng.weighted(['cable', 'joint', 'termination'] as const, [w.cable, w.joint, w.termination]);
+  const cause = spec.forceDamage || rng.next() < FAULT_WEIGHTS.thirdPartyShare.value ? 'third-party' : rng.weighted(['cable', 'joint', 'termination'] as const, [w.cable, w.joint, w.termination]);
   const cab = rng.weighted(cand, cand.map((c) => c.lengthKm));
   let frac = rng.range(0.1, 0.9);
   if (cause === 'termination') frac = rng.next() < 0.5 ? 0.02 : 0.98;
@@ -188,7 +194,7 @@ function generateFault(rng: Rng, net: Network, rings: RingInfo[], spec: Difficul
   const wm = mix[cause === 'third-party' ? 'thirdParty' : cause === 'termination' ? 'termination' : 'insulation'];
   const type: FaultType = rng.weighted(types, types.map((t) => wm[t]));
   const rf = cause === 'third-party' ? rng.range(0, 0.5) : rng.range(0, 3); // [A]
-  const damageReportAtMin = cause === 'third-party' && spec.damageReports && rng.next() < FAULT_WEIGHTS.damageReportProb.value ? rng.int(8, 45) : null;
+  const damageReportAtMin = cause === 'third-party' && spec.damageReports && (spec.forceDamage || rng.next() < FAULT_WEIGHTS.damageReportProb.value) ? rng.int(8, 45) : null;
   return { cable: cab.id, frac, type, rfOhm: rf, cause, damageReportAtMin };
 }
 
