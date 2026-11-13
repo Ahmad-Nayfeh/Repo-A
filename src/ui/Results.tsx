@@ -12,7 +12,7 @@ export function Results({ s, onExit, onBack, onNext }: { s: GameSession; onExit:
   const rec = sim.relayRecords[0];
   const [copied, setCopied] = useState(false);
   const label = s.mode === 'daily' ? `${t('daily')} ${s.date}` : s.mode === 'training' ? `${t('training')} ${s.training + 1}` : `${t('freePlay')} #${s.scenario.seed} ${t(s.scenario.difficulty)}`;
-  const share = `⚡ ${t('title')} · ${label} · ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${fmt(m.cmlOfgem)} ${t('customerMinutes')} (${t('parCml')} ${fmt(par)}) · ${fmt(m.switchingOps)} ops\n${s.replayUrl()}`;
+  const share = `⚡ ${t('title')} · ${label}\n${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${fmt(m.cmlOfgem)} ${t('customerMinutes')} (${t('parCml')} ${fmt(par)}) · ${fmt(m.switchingOps)} ${t('opsUnit')}\n${s.replayUrl()}`;
   const copy = async () => {
     try { await navigator.clipboard.writeText(share); setCopied(true); } catch { setCopied(false); }
   };
@@ -37,13 +37,13 @@ export function Results({ s, onExit, onBack, onNext }: { s: GameSession; onExit:
           {row(t('overloadMin'), fmt(m.overloadMin))}
           {row(t('nearMisses'), fmt(m.nearMisses))}
           {row(t('starEvents'), m.starEvents ? fmt(m.starEvents) : t('none'))}
-          {row(t('timeToPermit'), m.timeToPermitMin === null ? '—' : `${fmt(m.timeToPermitMin)} min`)}
+          {row(t('timeToPermit'), m.timeToPermitMin === null ? '—' : `${fmt(m.timeToPermitMin)} ${t('minUnit')}`)}
         </tbody>
       </table>
       <h3>{t('whatHappened')}</h3>
       <p>{t('faultWas', { type: t(`type_${f.type}`), cause: t(`cause_${f.cause}`), cable: f.cable, pct: Math.round(f.frac * 100), from: cab.from.replace(/[LRB]$/, ''), ik: eng.ik, i0: eng.i0 })}</p>
-      {rec && <p>{t('measuredVsActual', { element: rec.element === 'phase' ? t('elementPhase') : t('elementEarth'), ia: Math.round(rec.iMaxA), i0: Math.round(rec.i3i0A) })}</p>}
-      <pre class="share" dir="ltr">{share}</pre>
+      {rec && <p>{t(sim.net.fpis.some((x) => x.type === 'earth-only') && rec.i3i0A < 0.05 * rec.iMaxA ? 'measuredVsActual' : 'measuredVsActualShort', { element: rec.element === 'phase' ? t('elementPhase') : t('elementEarth'), ia: Math.round(rec.iMaxA), i0: Math.round(rec.i3i0A) })}</p>}
+      <pre class="share" dir="auto">{share}</pre>
       <div class="btns">
         <button class="primary" onClick={copy}>{copied ? t('copied') : t('share')}</button>
         {onNext && <button onClick={onNext}>{t('nextTraining')}</button>}

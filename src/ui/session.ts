@@ -38,8 +38,9 @@ export class GameSession {
     const ov = this.training >= 0 ? TRAINING[this.training]!.overrides : {};
     this.scenario = generateScenario(opts.seed, opts.difficulty, ov);
     this.sim = new Simulation(this.scenario);
-    this.apply({ kind: 'advance' }); // fault → protection trip
-    if (opts.replay) for (const a of opts.replay) this.apply(a);
+    // a replay already starts with the initial 'advance' (review G-01): never apply it twice
+    if (opts.replay && opts.replay.length > 0) for (const a of opts.replay) this.apply(a);
+    else this.apply({ kind: 'advance' }); // fault → protection trip
   }
 
   apply(a: Action): ActionResult {
@@ -59,12 +60,19 @@ export class GameSession {
     return this.parCache;
   }
 
+  private parOverloadCache: number | null = null;
+  parOverload(): number {
+    if (this.parOverloadCache === null) { const r = runBot(this.scenario); this.parOverloadCache = r.sim.metrics().overloadMin; }
+    return this.parOverloadCache;
+  }
+
   stars(): number {
     if (!this.sim.complete) return 0;
     const m = this.sim.metrics();
     if (m.starEvents > 0) return 0;
     const par = this.par();
-    if (m.cmlOfgem <= par) return 3;
+    // ★★★ also requires not running cables above rating longer than the reference strategy (review G-12, D-015)
+    if (m.cmlOfgem <= par && m.overloadMin <= this.parOverload()) return 3;
     if (m.cmlOfgem <= 1.25 * par) return 2;
     return 1;
   }

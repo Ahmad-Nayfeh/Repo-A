@@ -33,7 +33,7 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
         <article class="card">
           <h2>{t('training')}</h2>
           <p>{t('trainingDesc')}</p>
-          <div class="btns">{[0, 1, 2].map((i) => <button key={i} onClick={() => go(`#/training?t=${i}`)}>{fmt(i + 1)} {'★'.repeat(trainingStars[i]!)}</button>)}</div>
+          <div class="btns">{[0, 1, 2].map((i) => <button key={i} onClick={() => go(`#/training?t=${i}`)} title={t(`trDesc${i}`)}>{fmt(i + 1)} · {t(`trDesc${i}`)} {'★'.repeat(trainingStars[i]!)}</button>)}</div>
         </article>
         <article class="card">
           <h2>{t('freePlay')}</h2>
@@ -53,7 +53,7 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
           <label>{t('language')} <select value={lang.value} onChange={(e) => setLang((e.target as HTMLSelectElement).value as 'en' | 'ar')}><option value="ar">العربية</option><option value="en">English</option></select></label>
           <label>{t('digitsLabel')} <select value={digits.value} onChange={(e) => setDigits((e.target as HTMLSelectElement).value as 'latn' | 'arab')}><option value="latn">{t('digitsLatn')}</option><option value="arab">{t('digitsArab')}</option></select></label>
           <label>{t('theme')} <select value={theme} onChange={(e) => setTheme((e.target as HTMLSelectElement).value)}><option value="dark">{t('themeDark')}</option><option value="light">{t('themeLight')}</option></select></label>
-          <label><input type="checkbox" checked={!muted} onChange={(e) => { const m = !(e.target as HTMLInputElement).checked; setMuted(m); setM(m); }} /> 🔔</label>
+          <label class="toggle"><input type="checkbox" checked={!muted} onChange={(e) => { const m = !(e.target as HTMLInputElement).checked; setMuted(m); setM(m); }} /> 🔔 {t('soundLabel')}</label>
         </div>
       </section>
       <nav class="links">
@@ -72,7 +72,11 @@ export function ModelNotes({ go }: { go: (h: string) => void }) {
     for (const [k, v] of Object.entries(obj)) {
       if (v && typeof v === 'object' && 'label' in (v as object) && 'value' in (v as object)) {
         const p = v as { value: unknown; label: string; src: string };
-        rows.push({ name: `${group}.${k}`, value: JSON.stringify(p.value), label: p.label, src: p.src });
+        const val = p.value;
+        const pretty = typeof val === 'object' && val !== null && !Array.isArray(val)
+          ? Object.entries(val as Record<string, unknown>).map(([a, b]) => `${a}: ${typeof b === 'object' ? JSON.stringify(b).replace(/[{}"]/g, '').replace(/,/g, ', ') : String(b)}`).join(' · ')
+          : Array.isArray(val) ? (val as unknown[]).join(' – ') : String(val);
+        rows.push({ name: `${group}.${k}`, value: pretty, label: p.label, src: p.src });
       }
     }
   };

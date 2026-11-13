@@ -35,6 +35,7 @@ const dicts: Record<Lang, Dict> = { en, ar };
 export function t(key: keyof Dict | string, params: Record<string, string | number> = {}): string {
   const d = dicts[lang.value] as Record<string, string>;
   let s = d[key as string] ?? (en as Record<string, string>)[key as string] ?? String(key);
+  if (lang.value === 'ar' && digits.value === 'arab') s = s.replace(/[0-9]/g, (c) => '٠١٢٣٤٥٦٧٨٩'[Number(c)]!); // template digits only; IDs in params stay Latin
   for (const [k, v] of Object.entries(params)) s = s.split(`{${k}}`).join(typeof v === 'number' ? fmt(v) : v);
   return s;
 }

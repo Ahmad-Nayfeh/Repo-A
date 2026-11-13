@@ -24,7 +24,7 @@ export function NetworkView({ s, selection, onSelect, ringFilter }: Props) {
   const pts = rings.flatMap((r) => r.rmus.map((id) => sites.get(id)!));
   const ys = pts.map((p) => p.y);
   const minY = Math.min(-8, ...ys) - 10, maxY = Math.max(8, ...ys) + 12;
-  const vb = `-12 ${minY} 124 ${maxY - minY}`;
+  const vb = `-22 ${minY} 144 ${maxY - minY}`;
   const latestRead = new Map<string, { lit: boolean; t: number }>();
   for (const r of sim.readings) latestRead.set(r.fpi, { lit: r.phase || r.earth, t: r.t });
   const sw = (id: string) => sim.net.switches.find((x) => x.id === id)!;
@@ -49,7 +49,7 @@ export function NetworkView({ s, selection, onSelect, ringFilter }: Props) {
               const sel = selection?.kind === 'cable' && selection.id === cid;
               const suspect = sim.suspect.has(cid);
               return (
-                <g key={cid} class="cable-g" onClick={() => onSelect({ kind: 'cable', id: cid })} role="button" tabIndex={0}
+                <g key={cid} class="cable-g" onClick={() => onSelect({ kind: 'cable', id: cid })} role="button" tabindex={0}
                   aria-label={`${t('cable', { id: cid })}: ${live ? t('cableLive') : t('cableDead')}`}
                   onKeyDown={(e) => { if (e.key === 'Enter') onSelect({ kind: 'cable', id: cid }); }}>
                   <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} class="cable-hit" />
@@ -78,7 +78,7 @@ export function NetworkView({ s, selection, onSelect, ringFilter }: Props) {
               const fl = latestRead.get(`${id}-FL`), fr = latestRead.get(`${id}-FR`);
               const crewsHere = sim.crews.filter((c) => c.site === id || c.travellingTo === id);
               return (
-                <g key={id} data-id={id} class={`rmu ${sel ? "sel" : ""}`} onClick={() => onSelect({ kind: 'site', id })} role="button" tabIndex={0}
+                <g key={id} data-id={id} class={`rmu ${sel ? "sel" : ""}`} onClick={() => onSelect({ kind: 'site', id })} role="button" tabindex={0}
                   aria-label={`${t('rmu', { id })}: ${on ? t('supplyOn') : t('supplyOff')}`}
                   onKeyDown={(e) => { if (e.key === 'Enter') onSelect({ kind: 'site', id }); }}>
                   {mark(prev, L)}{mark(next, R)}
@@ -88,6 +88,7 @@ export function NetworkView({ s, selection, onSelect, ringFilter }: Props) {
                   {(ring.nop === L.id || ring.nop === R.id) && <text x={st.x} y={st.y - 4.2} class="nop" text-anchor="middle">NOP</text>}
                   {st.remote && <text x={st.x + 3.4} y={st.y - 2.6} class={`glyph rtu ${st.commsOk ? '' : 'lost'}`}>{st.commsOk ? '📡' : '⨯'}</text>}
                   {(fl?.lit || fr?.lit) && <text x={st.x - 4.6} y={st.y - 2.6} class="glyph fpi">⚡</text>}
+                  {(fl || fr) && !(fl?.lit || fr?.lit) && <text x={st.x - 4.4} y={st.y - 2.6} class="glyph fpi-dark">○</text>}
                   {crewsHere.length > 0 && <text x={st.x + 3.2} y={st.y + 4.4} class="glyph crew">🚚{crewsHere.length > 1 ? crewsHere.length : ''}</text>}
                 </g>
               );
@@ -99,15 +100,16 @@ export function NetworkView({ s, selection, onSelect, ringFilter }: Props) {
         const x = g === 'GA' ? 0 : 100;
         const sel = selection?.kind === 'site' && selection.id === g;
         return (
-          <g key={g} data-id={g} class={`gs ${sel ? "sel" : ""}`} onClick={() => onSelect({ kind: 'site', id: g })} role="button" tabIndex={0}
+          <g key={g} data-id={g} class={`gs ${sel ? "sel" : ""}`} onClick={() => onSelect({ kind: 'site', id: g })} role="button" tabindex={0}
             aria-label={t('gridStation', { name: g === 'GA' ? 'A' : 'B' })} onKeyDown={(e) => { if (e.key === 'Enter') onSelect({ kind: 'site', id: g }); }}>
+            <rect x={g === 'GA' ? x - 22 : x - 5} y={-6} width="27" height={Math.max(12, 4 + 3.2 * rings.length)} class="hit" />
             <rect x={x - 5} y={-5} width="10" height="10" rx="1.5" class="gs-box" />
             <text x={x} y={1.2} class="gs-label" text-anchor="middle">{g === 'GA' ? 'A' : 'B'}</text>
             {rings.map((r) => {
               const cbId = g === 'GA' ? r.ringSwitches[0]! : r.ringSwitches[r.ringSwitches.length - 1]!;
               const cb = sw(cbId);
               const tripped = sim.relayRecords.some((rr) => rr.cb === cbId) && !cb.closed;
-              return <text key={cbId} x={x} y={8.5 + 3.2 * sc.rings.indexOf(r)} class={`cb ${cb.closed ? 'closed' : 'open'} ${tripped ? 'tripped' : ''}`} text-anchor="middle">{cb.closed ? '■' : '□'} {r.id}</text>;
+              return <text key={cbId} x={x + (g === 'GA' ? -6.5 : 6.5)} y={-3 + 3.2 * sc.rings.indexOf(r)} class={`cb ${cb.closed ? 'closed' : 'open'} ${tripped ? 'tripped' : ''}`} text-anchor={g === 'GA' ? 'end' : 'start'}>{cb.closed ? '■' : '□'} {cbId}</text>;
             })}
           </g>
         );

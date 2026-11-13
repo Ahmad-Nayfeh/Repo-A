@@ -49,7 +49,7 @@ interface Ev { t: number; seq: number; kind: string; data: Record<string, string
 export interface Crew { id: number; x: number; y: number; site: string | null; busyUntil: number; task: string | null; travellingTo: string | null }
 
 export interface FpiState { phase: boolean; earth: boolean; since: number }
-export interface FpiReading { site: string; fpi: string; phase: boolean; earth: boolean; type: string; t: number }
+export interface FpiReading { site: string; fpi: string; phase: boolean; earth: boolean; type: string; t: number; since?: number; remote?: boolean }
 export interface RelayRecord { cb: string; t: number; iMaxA: number; i3i0A: number; phases: string; element: 'phase' | 'earth' }
 
 export interface Metrics {
@@ -78,7 +78,8 @@ export class Simulation {
   tripT: number | null = null;
   suspect = new Set<string>();   // cables dead since the fault trip and not proven healthy
   permits = new Set<string>();
-  provedDead = new Set<string>();      // switch ids whose cable side was tested dead since last energisation
+  provedDead = new Set<string>();
+  repaired = new Set<string>();      // switch ids whose cable side was tested dead since last energisation
   /** per ring: cables that can still contain the fault after trial-close trips (single-fault assumption) */
   candidates = new Map<string, Set<string>>();
   private lastNewly: { cables: Set<string>; t: number } | null = null;
@@ -132,10 +133,10 @@ export class Simulation {
   /** Advance until the next player-relevant event (or `untilT`). */
   advance(untilT?: number): void {
     const quiet = new Set(['tick']);
-    // "advance to next event" never skips more than 2 h of quiet time (ticks only)
+    // "advance to next event" never skips more than 30 min of quiet time (review G-07)
     if (untilT === undefined) {
       const next = this.queue.find((e) => !quiet.has(e.kind));
-      if (!next || next.t > this.t + 120 * MIN) { this.advance(this.t + 120 * MIN); return; }
+      if (!next || next.t > this.t + 30 * MIN) { this.advance(this.t + 30 * MIN); return; }
     }
     for (let guard = 0; guard < 10000; guard++) {
       const ev = this.nextEvent();
@@ -183,6 +184,7 @@ export class Simulation {
         this.repairing = null;
         if (String(ev.data.cable) === this.scenario.fault.cable) this.faultPresent = false;
         this.suspect.delete(String(ev.data.cable)); // repaired and tested before return to service
+        this.repaired.add(String(ev.data.cable));
         this.log.push({ t: this.t, kind: 'repairDone', data: { cable: String(ev.data.cable) } });
         break;
       }
@@ -410,6 +412,24 @@ export class Simulation {
 
   // ---------- actions ----------
   apply(a: Action): ActionResult {
+    const r = this.applyInner(a);
+    this.settleProtection();
+    return r;
+  }
+
+  /** Protection acts within seconds: process trips due in the next 5 s so the screen never shows a stale state (G-03). */
+  private settleProtection() {
+    for (let g = 0; g < 10; g++) {
+      const ev = this.queue[0];
+      if (!ev || ev.kind !== 'trip' || ev.t > this.t + 5000) return;
+      this.queue.shift();
+      this.accumulate(ev.t);
+      this.t = ev.t;
+      this.handle(ev);
+    }
+  }
+
+  private applyInner(a: Action): ActionResult {
     if (this.complete && a.kind !== 'advance') return { ok: false, reason: 'complete' };
     switch (a.kind) {
       case 'advance': this.advance(); return { ok: true };
@@ -482,8 +502,8 @@ export class Simulation {
           const cableBus = this.cableSideBus(s);
           if (this.isEnergised(cableBus)) return this.block('liveCable', { switch: s.id });
           if (!this.provedDead.has(s.id)) return this.block('notProved', { switch: s.id });
-          s.earthed = true;
-          this.busy(c, 5 * MIN, 'earth', { switch: s.id });
+          this.busy(c, 5 * MIN, 'earth', { switch: s.id }); // earth switch is closed when the crew finishes
+          return { ok: true };
         } else {
           if (this.permitsOnCable(this.cableOfSwitch(s))) return this.block('permitOpen', { switch: s.id });
           s.earthed = false;
@@ -526,6 +546,7 @@ export class Simulation {
       case 'repair': {
         if (!this.permits.has(a.cable)) return this.block('noPermit', { cable: a.cable });
         if (this.repairing) return { ok: false, reason: 'repairOngoing' };
+        if (this.repaired.has(a.cable)) return { ok: false, reason: 'already' };
         const [lo, hi] = OPERATIONS.repairHours.value;
         const hrs = lo + (hi - lo) * Rng.stream(this.scenario.seed, 'repair').next();
         this.repairing = a.cable;
@@ -561,6 +582,12 @@ export class Simulation {
     } else if (task === 'attendDamage') {
       this.damageAttended = true;
       this.log.push({ t: this.t, kind: 'damageAttended', data: { crew: c.id } });
+    } else if (task === 'earth') {
+      const s = this.swById.get(String(ev.data.switch))!;
+      if (!s.closed && !this.isEnergised(this.cableSideBus(s))) {
+        s.earthed = true;
+        this.log.push({ t: this.t, kind: 'earth', data: { switch: s.id, on: true } });
+      }
     } else if (task === 'operate') {
       this.finishOperate(String(ev.data.switch), String(ev.data.op) as 'open' | 'close', Number(ev.data.opCrew));
     } else {
@@ -575,7 +602,7 @@ export class Simulation {
     if (!s.commsOk) return { ok: false, reason: 'commsLost' };
     for (const f of this.net.fpis.filter((x) => x.site === site)) {
       const st = this.fpi.get(f.id)!;
-      this.readings.push({ site, fpi: f.id, phase: st.phase, earth: st.earth, type: f.type, t: this.t });
+      this.readings.push({ site, fpi: f.id, phase: st.phase, earth: st.earth, type: f.type, t: this.t, since: st.since, remote: true }); // SCADA events carry a timestamp
     }
     this.log.push({ t: this.t, kind: 'fpiRead', data: { site, remote: true } });
     return { ok: true };

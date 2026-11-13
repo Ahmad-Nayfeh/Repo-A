@@ -37,7 +37,9 @@ export function Game({ s, onExit, onNext }: { s: GameSession; onExit: () => void
   const msg = (r: ActionResult) => {
     if (r.ok) { setToast(null); return; }
     const key = `blk_${r.reason}`;
-    const text = t(key) !== key ? t(key, r.reasonData ?? {}) : t(`err_${r.reason}`);
+    const data: Record<string, string | number> = { ...(r.reasonData ?? {}) };
+    if (typeof data.crew === 'number') data.crew = data.crew + 1; // crews are shown 1-based (G-04)
+    const text = t(key) !== key ? t(key, data) : t(`err_${r.reason}`);
     setToast(text);
   };
   const run = (a: Action) => {
@@ -66,7 +68,7 @@ export function Game({ s, onExit, onNext }: { s: GameSession; onExit: () => void
         <button class="ghost" onClick={onExit} aria-label={t('menu')}>☰</button>
         <div class="stat"><span>{t('time')}</span><b>{clock(hour)}</b></div>
         <div class="stat"><span>{t('customersOff')}</span><b class={m.customersTotal && sim.customersOff() > 0 ? 'warn' : ''}>{fmt(sim.customersOff())}</b></div>
-        <div class="stat"><span>{t('customerMinutes')}</span><b>{fmt(m.cmlOfgem)}</b></div>
+        <div class="stat" title={t('cmlRuleNote')}><span>{t('customerMinutes')} ⓘ</span><b>{fmt(m.cmlOfgem)}</b></div>
         <div class="hud-actions">
           <button onClick={() => run({ kind: 'wait', minutes: 5 })}>{t('wait5')}</button>
           <button class="primary" onClick={() => run({ kind: 'advance' })}>{t('advance')} ⏭</button>
@@ -109,23 +111,26 @@ export function Game({ s, onExit, onNext }: { s: GameSession; onExit: () => void
   );
 }
 
+/** Training hints follow the actual stage of the job (G-06). Guided training may consult the scenario. */
 function trainingHint(s: GameSession): string | null {
   if (s.training < 0) return null;
   if (s.training === 1) return 'tr2';
   if (s.training === 2) return 'tr3';
   const sim = s.sim;
-  if (sim.readings.length === 0) return sim.t < 2 * MIN ? 'tr1_1' : 'tr1_2';
-  const ring = s.scenario.rings[0]!;
   const fc = s.scenario.fault.cable;
+  if (sim.complete) return null;
+  if (!sim.faultPresent || sim.repaired.has(fc)) return 'tr1_6';
+  if (sim.repairing) return 'tr1_rep';
+  if (sim.permits.has(fc)) return 'tr1_rep0';
   const isolated = sim.switchesBounding(fc).every((x) => !x.closed);
-  if (!isolated) return 'tr1_3';
-  if (sim.customersOff() > 0) return 'tr1_4';
-  void ring;
+  if (!isolated) return sim.readings.length === 0 ? (sim.t < 2 * MIN ? 'tr1_1' : 'tr1_2') : 'tr1_3';
+  const restorable = sim.net.loads.filter((l) => !sim.isEnergised(l.bus)).length;
+  if (restorable > 0) return 'tr1_4';
   return 'tr1_5';
 }
 
 function swName(s: GameSession, sw: Switch): string {
-  if (sw.kind === 'CB') return t('breaker', { id: sw.id });
+  if (sw.kind === 'CB') return t('breakerName');
   const sideA = sw.id.endsWith('-L');
   return t(sideA ? 'switchL' : 'switchR', { to: sideA ? 'A' : 'B' });
 }
@@ -155,10 +160,10 @@ function SitePanel({ s, sel, run, engineer }: { s: GameSession; sel: Selection; 
       <ul class="switches">
         {(site.kind === 'gs' ? sim.net.switches.filter((x) => x.kind === 'CB' && x.site === site.id) : switches).map((sw) => (
           <li key={sw.id}>
-            <div><b>{swName(s, sw)}</b> <code>{sw.id}</code></div>
+            <div><b>{swName(s, sw)}</b> · <bdi><code>{sw.id}</code></bdi></div>
             <div class="state">{sw.closed ? `■ ${t('closed')}` : `□ ${t('open')}`}{ring?.nop === sw.id ? ` · ${t('nop')}` : ''}{sw.earthed ? ` · ⏚ ${t('earthed')}` : ''}{sim.secured.has(sw.id) ? ` · 🔒 ${t('secured')}` : ''}{sim.provedDead.has(sw.id) && !sw.earthed ? ` · ✓ ${t('provedDead')}` : ''} · <span class="muted">{t('dutyLeft', { n: sw.faultMakeLeft })}</span></div>
             <div class="btns">
-              {opBtn(sw, sw.closed ? 'open' : 'close')}
+              {!(sim.secured.has(sw.id) && !sw.closed) && opBtn(sw, sw.closed ? 'open' : 'close')}
               {sw.kind === 'LBS' && crewsHere.map((c) => [
                 !sw.closed && !sim.secured.has(sw.id) && <button key={`s${c.id}`} onClick={() => run({ kind: 'secure', crew: c.id, switch: sw.id })}>{t('actSecure')}</button>,
                 sim.secured.has(sw.id) && !sw.earthed && !sim.provedDead.has(sw.id) && <button key={`p${c.id}`} onClick={() => run({ kind: 'proveDead', crew: c.id, switch: sw.id })}>{t('actProveDead')}</button>,
@@ -177,7 +182,9 @@ function SitePanel({ s, sel, run, engineer }: { s: GameSession; sel: Selection; 
             const id = `${site.id}-${side}`;
             const f = sim.net.fpis.find((x) => x.id === id)!;
             const r = latest(id);
-            return <div key={id} class="fpi">{side === 'FL' ? t('sideTowardA') : t('sideTowardB')} · {f.type === 'three-phase' ? t('fpiType3') : t('fpiTypeE')}: {r ? <b class={r.phase || r.earth ? 'lit' : ''}>{r.phase || r.earth ? `⚡ ${t('fpiLit')}` : t('fpiDark')} ({clock(sim.hourOfDay(r.t))})</b> : <span class="muted">{t('fpiNotRead')}</span>}</div>;
+            const lit = r && (r.phase || r.earth);
+            const stamp = r && lit && r.remote ? (r.since !== undefined && r.since >= 0 ? ` · ${t('flagAt', { time: clock(sim.hourOfDay(r.since)) })}` : ` · ${t('flagOld')}`) : '';
+            return <div key={id} class="fpi">{side === 'FL' ? t('sideTowardA') : t('sideTowardB')} · {f.type === 'three-phase' ? t('fpiType3') : t('fpiTypeE')}: {r ? <b class={lit ? 'lit' : ''}>{lit ? `⚡ ${t('fpiLit')}` : `○ ${t('fpiDark')}`} ({t('readAt', { time: clock(sim.hourOfDay(r.t)) })}{stamp})</b> : <span class="muted">{t('fpiNotRead')}</span>}</div>;
           })}
           <div class="btns">
             {site.remote && site.commsOk && <button onClick={() => run({ kind: 'readRemote', site: site.id })}>{t('actReadRemote')}</button>}
@@ -211,7 +218,8 @@ function CablePanel({ s, id, run }: { s: GameSession; id: string; run: (a: Actio
       {sim.permits.has(id) ? <p><b>📄 {t('permitHeld')}</b>{sim.repairing === id ? ` · 🔧 ${t('repairing')}` : ''}</p> : <p class="muted">{t('permitNeeds')}</p>}
       <div class="btns">
         {!sim.permits.has(id) && <button onClick={() => run({ kind: 'permit', cable: id, on: true })}>📄 {t('permitIssue')}</button>}
-        {sim.permits.has(id) && !sim.repairing && <button onClick={() => run({ kind: 'repair', cable: id })}>🔧 {t('repairStart')}</button>}
+        {sim.permits.has(id) && !sim.repairing && !sim.repaired.has(id) && <button onClick={() => run({ kind: 'repair', cable: id })}>🔧 {t('repairStart')}</button>}
+        {sim.repaired.has(id) && <span>✅ {t('repaired')}</span>}
         {sim.permits.has(id) && sim.repairing !== id && <button onClick={() => run({ kind: 'permit', cable: id, on: false })}>{t('permitCancel')}</button>}
       </div>
     </div>
@@ -264,6 +272,7 @@ function LogPanel({ s }: { s: GameSession }) {
     for (const [k, v] of Object.entries(d)) {
       if (k === 'op') out[k] = v === 'open' ? t('opened') : t('closedV');
       else if (k === 'on') out[k] = v ? t('on') : t('off');
+      if (k === 'on' && 'cable' in d) out[k] = v ? t('issued') : t('cancelled');
       else if (k === 'crew') out[k] = Number(v) + 1;
       else if (k === 'reason') out[k] = t(`blk_${v}`) !== `blk_${v}` ? t(`blk_${v}`, {}) : String(v);
       else if (k === 'element') out[k] = v === 'phase' ? t('elementPhase') : t('elementEarth');
@@ -293,6 +302,7 @@ function SwitchList({ s, onSelect, ringFilter }: { s: GameSession; onSelect: (x:
             <li key={id}><button class="link" onClick={() => onSelect({ kind: 'site', id })}>{id}</button> {sim.isEnergised(`${id}B`) ? '●' : '○'} L:{sim.net.switches.find((x) => x.id === `${id}-L`)!.closed ? '■' : '□'} R:{sim.net.switches.find((x) => x.id === `${id}-R`)!.closed ? '■' : '□'}</li>
           ))}
           {r.cables.map((c) => <li key={c}><button class="link" onClick={() => onSelect({ kind: 'cable', id: c })}>{c}</button> {sim.cableEnergised(c) ? '━' : '┅'}</li>)}
+          {(['GA', 'GB'] as const).map((g) => { const cb = sim.net.switches.find((x) => x.id === `${r.id}-${g === 'GA' ? 'CBA' : 'CBB'}`)!; return <li key={g}><button class="link" onClick={() => onSelect({ kind: 'site', id: g })}>{cb.id}</button> {cb.closed ? '■' : '□'}</li>; })}
         </ul>
       ))}
     </details>
@@ -301,6 +311,23 @@ function SwitchList({ s, onSelect, ringFilter }: { s: GameSession; onSelect: (x:
 
 function Checklist({ s, c, onCancel, onConfirm }: { s: GameSession; c: { sw: string; crew: number | null }; onCancel: () => void; onConfirm: (j: Justification) => void }) {
   const p = s.sim.closePreview(c.sw, c.crew);
+  const allOk = p.delayLeftMin === 0 && p.crewsInside.length === 0 && !p.damage && p.dutyLeft > 0;
+  useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null;
+    (document.querySelector('.modal button.primary:not([disabled]), .modal button') as HTMLElement | null)?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel();
+      if (e.key === 'Tab') { // keep focus inside the dialog
+        const els = [...document.querySelectorAll<HTMLElement>('.modal button:not([disabled])')];
+        if (!els.length) return;
+        const i = els.indexOf(document.activeElement as HTMLElement);
+        const n = e.shiftKey ? (i <= 0 ? els.length - 1 : i - 1) : (i + 1) % els.length;
+        els[n]!.focus(); e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => { window.removeEventListener('keydown', onKey); prev?.focus(); };
+  }, []);
   const ok = (b: boolean) => (b ? `✅ ${t('chkOk')}` : `❌ ${t('chkNotOk')}`);
   return (
     <div class="modal-back" role="dialog" aria-modal="true" aria-labelledby="chk-title">
@@ -314,9 +341,10 @@ function Checklist({ s, c, onCancel, onConfirm }: { s: GameSession; c: { sw: str
           <li>{t('chkDuty', { n: p.dutyLeft })}</li>
         </ul>
         <p class="muted">{t('chkNote')}</p>
+        {!allOk && <p class="warn-text">{t('chkFix')}</p>}
         <div class="btns">
           <button onClick={onCancel}>{t('cancel')}</button>
-          <button class="primary" onClick={() => onConfirm('delay')}>{t('chkConfirm')}</button>
+          <button class="primary" disabled={!allOk} onClick={() => onConfirm('delay')}>{t('chkConfirm')}</button>
         </div>
       </div>
     </div>

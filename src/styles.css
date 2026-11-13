@@ -140,3 +140,20 @@ th, td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: sta
 .ladder-cable.live .bar { color: var(--live); }
 .ladder-cable.suspect { border-color: var(--warn); }
 .ladder button.sel { outline: 3px solid var(--focus); }
+
+/* release-review fixes (G-10, G-19, G-23, G-09, G-05) */
+.ring-picker button, button.ghost, .links a, .ladder-cable { min-height: 44px; }
+.links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; }
+.btns button { min-width: 44px; }
+.net .glyph.fpi-dark { fill: var(--muted); font-size: 3px; }
+.warn-text { color: var(--warn); font-weight: 600; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.toggle input { width: 22px; height: 22px; }
+.page .table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.params { min-width: 640px; }
+@media (max-width: 860px) {
+  .hud { position: static; }
+  .panel { scroll-margin-top: 8px; }
+}
+.net .hit { fill: transparent; }

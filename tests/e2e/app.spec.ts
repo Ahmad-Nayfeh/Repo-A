@@ -61,3 +61,19 @@ test('complete a shift through the UI session and see the shift report with star
   await expect(page.locator('.stars')).toContainText('★');
   await expect(page.locator('.share')).toContainText('Grid Shift');
 });
+
+test('keyboard: RMUs are reachable by Tab and selectable with Enter; switch list includes feeder breakers (G-02)', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('gs.lang', 'en'));
+  await page.goto('/#/training?t=0');
+  await expect(page.getByText(/Relay record/)).toBeVisible();
+  let reached = false;
+  for (let i = 0; i < 40 && !reached; i++) {
+    await page.keyboard.press('Tab');
+    reached = await page.evaluate(() => (document.activeElement as Element | null)?.classList?.contains('rmu') ?? false);
+  }
+  expect(reached).toBe(true);
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: /^RMU / })).toBeVisible();
+  await page.getByText('Switching points').click();
+  await expect(page.locator('.switch-list').getByRole('button', { name: 'R1-CBA' })).toBeVisible();
+});
