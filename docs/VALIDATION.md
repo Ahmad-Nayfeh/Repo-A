@@ -71,11 +71,11 @@ Not yet a golden test: CT158 §3.5 (30 kV network with transformer zero-sequence
 
 ## 7. Browser (`tests/e2e/app.spec.ts`, Playwright)
 
-| Check | Local (Chromium) | CI (Chromium, Firefox, WebKit) |
+| Check | Local (Chromium) | CI (Chromium, Firefox, WebKit) — all 15 passed in run 43453723047 |
 |---|---|---|
 | Home EN/AR renders, correct `dir`, no console errors, axe: 0 serious/critical | pass | runs on every push |
 | Game screen: relay record visible, axe 0 critical, checklist dialog on re-close of the tripped breaker | pass | " |
-| **Cross-engine determinism**: bot-run state hash in the browser equals Node's (easy/normal/hard) | pass (V8) | Firefox (SpiderMonkey) and WebKit (JavaScriptCore) run in CI — see Actions |
+| **Cross-engine determinism**: bot-run state hash in the browser equals Node's (easy/normal/hard) | pass (V8) | **pass on Chromium 153, Firefox 155 (SpiderMonkey), WebKit 26.6 (JavaScriptCore)** — CI run 43453723047: "15 passed" (5 tests × 3 engines) |
 | Full shift to the shift report with stars and share text | pass | " |
 
 ## 8. Not validated (stated openly)
