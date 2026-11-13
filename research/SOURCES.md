@@ -821,3 +821,13 @@ No alfanar documents were used. Research date: 2026-11-13. Draft, updated as res
 - **aeconline.ae "Medium Voltage Power Cables" catalogue** (https://www.aeconline.ae/medium-voltage-power-cables-catalogue-1012241/file-files/medium_voltage_power_cables.pdf). It was fetched, but its PDF metadata shows it is an **alfanar** catalogue (Riyadh industrial complex, alfanar logo file paths). Under the project rule it was **excluded and not cited**. It is the source of the 130 °C / 1500 h claim and of IEC 60502-2-style derating tables up to 3.0 K·m/W.
 - alfanar.com catalogues appeared in search results and were not opened.
 - Blog or vendor pages giving IEEE C57.104 "limits" (industrialmonitordirect, elscotransformers): not attributable to the 2019 tables, so rejected.
+
+---
+
+## From `research/sources/12-t12.md`
+
+[T12-01] SEC 51-SDMS-04 Rev.02 Distribution transformers with aluminum windings 11–36 kV — Saudi Electricity Company, 2019 — https://www.se.com.sa/-/media/4B142820A248473F8E6491FE07AFC24F.ashx — verified — ratings, losses, emergency loading, Dyn11, impedance 4/5/6 %, temperature rises 45/50 K, hot-spot 98 °C, 55 °C ambient guarantee
+[T12-02] SEC 51-SDMS-02 Distribution transformers up to 36 kV 400/230 V — SEC, 2010 — https://www.se.com.sa/-/media/9C3D34FDCAED45C08A9F2A1D393EF251.ashx — verified — loss capitalisation formula T = P + 11000C + 4000W (SAR), 30 °C design temperature
+[T12-03] SEC 51-SDMS-01 Rev.02 Distribution transformers up to 36 kV — SEC, 2004 — https://www.se.com.sa/-/media/4B06F151AA5647AF88B86B240C34F405.ashx — verified — earlier edition of rating basis and emergency table
+[T12-04] SEC 52-SDMS-01 Rev.0 Enclosed dry-type distribution transformers — SEC, 2022 — https://www.se.com.sa/-/media/178A2F7F3F3D4F188435356EF947AB24.ashx — verified (headings) — indoor 50 °C ambient
+[T12-05] SEC 53-SDMS-01 Power transformers for primary distribution — SEC, 2013 — https://www.se.com.sa/-/media/09A8A5CFC52C4E768B09AECF28D6BFCD.ashx — verified (headings) — design ambient per data schedule
