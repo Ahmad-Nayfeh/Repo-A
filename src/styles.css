@@ -178,3 +178,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .grading .card { margin-top: 12px; }
 .row label.toggle { flex-direction: row; align-items: center; }
 .tcc .fault-label { fill: var(--off); font-size: 10px; }
+.tcc .fault-label { fill: var(--off); font-size: 15px; font-weight: 700; }
+.tcc-legend { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.9rem; }
+.tcc-legend li { display: flex; align-items: center; gap: 6px; }
+.fault-key { color: var(--off); }
+@media (max-width: 600px) { .tcc .axis { font-size: 16px; } }

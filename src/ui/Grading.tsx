@@ -51,6 +51,11 @@ export function Grading({ seed, initial, onExit }: { seed: number; initial: stri
       <div class="board">
         <section class="map">
           <Tcc g={g} st={st} par={showPar && par ? par.settings : null} />
+          <ul class="tcc-legend">
+            {RELAYS.map((k) => <li key={k}><svg width="30" height="10" aria-hidden="true"><line x1="0" x2="30" y1="5" y2="5" stroke={COLORS[k]} stroke-width="3" stroke-dasharray={DASH[k]} /></svg> {t(`gr_${k}`)}</li>)}
+            {g.cases.filter((c) => c.level === 'max').map((c, i) => <li key={c.id}><b class="fault-key">{'①②③'[i]}</b> {t(`grCase_${c.where}`)} · <bdi dir="ltr">{fmt(c.iA)} A</bdi></li>)}
+            {showPar && <li><svg width="30" height="10" aria-hidden="true"><line x1="0" x2="30" y1="5" y2="5" stroke="var(--muted)" stroke-width="1.5" /></svg> {t('grPar', { s: fmt(parScore, 3) })}</li>}
+          </ul>
           <p class="muted small">{t('grLegend', { cti: fmt(CTI_S, 2), mult: fmt(INRUSH_MULT), ts: fmt(INRUSH_S, 2) })}</p>
         </section>
         <aside class="panel">
@@ -83,7 +88,7 @@ export function Grading({ seed, initial, onExit }: { seed: number; initial: stri
         <table class="metrics">
           <thead><tr><th>{t('grCase')}</th><th>{t('gr_T')}</th><th>{t('gr_F')}</th><th>{t('gr_I')}</th></tr></thead>
           <tbody>{g.cases.map((c) => (
-            <tr key={c.id}><th scope="row">{t(`grCase_${c.where}`)} · {t(`grLevel_${c.level}`)} · {fmt(c.iA)} A</th>
+            <tr key={c.id}><th scope="row">{t(`grCase_${c.where}`)} · {t(`grLevel_${c.level}`)} · <bdi dir="ltr">{fmt(c.iA)} A</bdi></th>
               {RELAYS.map((k) => { const tm = ev.times[c.id]![k]; return <td key={k} dir="ltr">{tm === undefined ? '' : Number.isFinite(tm) ? `${fmt(tm, 3)} s` : '—'}</td>; })}</tr>
           ))}</tbody>
         </table>
@@ -119,11 +124,10 @@ function Tcc({ g, st, par }: { g: ReturnType<typeof generateGrading>; st: Settin
       {yt.map((y) => <g key={y}><line x1={L} x2={W - R} y1={ly(y)} y2={ly(y)} class="grid" /><text x={L - 6} y={ly(y) + 4} text-anchor="end" class="axis">{y}</text></g>)}
       <text x={(W + L) / 2} y={H - 4} text-anchor="middle" class="axis">A (13.8 kV)</text>
       <text x={12} y={H / 2} text-anchor="middle" class="axis" transform={`rotate(-90 12 ${H / 2})`}>s</text>
-      {g.cases.filter((c) => c.level === 'max').map((c, i) => <g key={c.id}><line x1={lx(c.iA)} x2={lx(c.iA)} y1={T} y2={H - B} class="fault" /><text x={lx(c.iA) - 3 - 11 * (i % 2)} y={H - B - 6} class="axis fault-label" text-anchor="start" transform={`rotate(-90 ${lx(c.iA) - 3 - 11 * (i % 2)} ${H - B - 6})`}>{t(`grCase_${c.where}`)}</text></g>)}
+      {g.cases.filter((c) => c.level === 'max').map((c, i) => <g key={c.id}><line x1={lx(c.iA)} x2={lx(c.iA)} y1={T} y2={H - B} class="fault" /><text x={lx(c.iA) + (i === 2 ? 4 : -4)} y={T + 14 + i * 18} class="fault-label" text-anchor={i === 2 ? 'start' : 'end'}>{'①②③'[i]}</text></g>)}
       <circle cx={lx(INRUSH_MULT * g.inT)} cy={ly(INRUSH_S)} r={4} class="inrush"><title>{t('grInrush')}</title></circle>
       {par && RELAYS.map((k) => <path key={`p${k}`} d={path(par[k])} class="par" />)}
       {RELAYS.map((k) => <path key={k} d={path(st[k])} fill="none" stroke={COLORS[k]} stroke-width={2.4} stroke-dasharray={DASH[k]} />)}
-      {RELAYS.map((k, i) => <g key={`l${k}`}><line x1={L + 10} x2={L + 34} y1={H - B - 52 + i * 16} y2={H - B - 52 + i * 16} stroke={COLORS[k]} stroke-width={2.4} stroke-dasharray={DASH[k]} /><text x={L + 40} y={H - B - 48 + i * 16} class="axis">{t(`gr_${k}`)}</text></g>)}
     </svg>
   );
 }
