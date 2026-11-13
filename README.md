@@ -6,7 +6,7 @@
 ### لعبة واقعية ثنائية اللغة لتشغيل شبكات التوزيع: حدِّد العطل، وحافظ على السلامة، وأعِد الكهرباء لكل مشترك.
 
 [![CI](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml/badge.svg?branch=claude/new-session-k41b2n)](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-64%20unit%2Fgolden%2Fproperty%20%2B%2024%20e2e-brightgreen)
+![Tests](https://img.shields.io/badge/tests-71%20unit%2Fgolden%2Fproperty%20%2B%2024%20e2e-brightgreen)
 ![Physics](https://img.shields.io/badge/physics-validated%20against%20published%20references-blue)
 ![Languages](https://img.shields.io/badge/languages-العربية%20%7C%20English-orange)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -50,7 +50,7 @@ No existing game we found does this. We surveyed about 20 titles: the free and c
 | 🏙️ **Saudi network template** | Open rings between two grid stations, package substations (RMU + Dyn11 transformer), 3×300 mm² Al XLPE, ≤ 50 % ring loading, 60 Hz. Taken from public SEC planning standards and material specifications. |
 | ⚙️ **Real engine** | Power flow, IEC 60909-style short circuit (all fault types, neutral earthing resistor, cable capacitance), IEC/IEEE inverse-time relays, fault passage indicators that see only the current through their sensor. |
 | 🦺 **Safety taught correctly** | Interlocks act within one panel only; the remote end is protected by procedure (lock & tag, earth, permit). Re-energisation needs a verified checklist. Damage reports block re-energising. |
-| 🔁 **Replayable** | Procedural districts, a daily challenge (same seed for everyone), free play by seed, shareable replay links. Same seed and same actions give the same result on Chrome, Firefox and Safari engines. |
+| 🔁 **Replayable** | Procedural districts, a daily challenge (same seed for everyone, with a rotating *condition of the day*: solid earthing, 40 °C heat, one crew, SCADA trouble, stale indicators, digger strike), free play by seed, shareable replay links. Same seed and same actions give the same result on Chrome, Firefox and Safari engines. |
 | 🌍 **Arabic first-class** | Full RTL interface with natural technical Arabic; diagrams are never mirrored; Western or Arabic-Indic digits. |
 | 🆓 **Free forever** | Static site, no accounts, no server, no paid APIs, MIT-licensed. |
 
