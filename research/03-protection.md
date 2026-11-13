@@ -180,7 +180,7 @@ NPAG ch. 9 worked example, Glover/Overbye and Gers & Holmes examples: **NOT FOUN
 1. IEC 60255-151 Table A.1 exact values, including any IEC reset tr constants and the normative GT/GD definitions (need standard text).
 2. IEEE C37.112-2018 changes vs 1996 constants.
 3. NPAG ch. 9 recommended grading margins and its worked example; Gers & Holmes / Glover examples — need access (library/PDF supplied by owner).
-4. IEC 62271-105 transfer-current determination rule (Annex B) and typical RMU T0 values; fuse TCC data for 13.8 kV RMU fuses (owner's supplier data would be best).
+4. IEC 62271-105 transfer-current determination rule (Annex B) and typical RMU T0 values; fuse TCC data for 13.8 kV RMU fuses ~~(owner's supplier data would be best)~~ [superseded by D-004a: public source only].
 5. Earth-fault pickup practice (% of CT primary) and CBCT sensitivity in SEC (Saudi Electricity Co.) practice — owner input.
 6. Minimum energizing current of self-powered relays (REJ603 / others) — manual pages not read.
 7. Knee-point definition (IEC 61869-2 vs IEEE C57.13) — read the standards.

@@ -3,26 +3,22 @@
 _Last updated: 2026-11-13 (session 1)_
 
 ## Current phase
-Phase 1 — Deep research (in progress).
+Phase 3 — Design (GDD, ARCHITECTURE, FIDELITY drafted; design review next).
+
+## Gates passed (evidence)
+- **Phase 1 exit: PASS** — independent reviewer (fresh context) found 31 issues (1 Critical); all resolved; re-verification PASS: research/REVIEW-phase1.md §E.
+- Phase 2: charters with measurable gates in docs/org/ (D-007). Reviewed as part of the Phase 3 design review.
 
 ## Done
-- Phase 0 bootstrap: STATUS, DECISIONS, NEEDS-AHMAD, research/SOURCES.md created.
-
-## Research round 1 (launched, parallel agents → research/NN-*.md + research/sources/NN-*.md)
-01 KSA grid context · 02 faults & short circuit · 03 protection · 04 power flow & test feeders ·
-05 thermal & assets · 06 PQ/DER/arc flash/LV · 07 operations/safety/reliability/planning · 08 game design.
-If a file is missing after interruption, re-run that topic only.
-
-## Progress (session 1)
-- Round 1 research DONE: research/01..08 + sources; SOURCES.md merged; SYNTHESIS.md draft v1 written.
-- Round 2 (gap-filling) RUNNING after a container restart: 09-ksa-round2, 10-sc-protection-round2, 11-assets-round2.
-  If missing after another interruption: re-run those 3 topics (briefs: see 'Open questions' sections of 01/02/03/05/06).
+- Phase 0 bootstrap.
+- Research rounds 1 + 2 + lead research 12 (SEC transformer specs): research/01..12, SOURCES.md (merged by scripts/merge_sources.py), SYNTHESIS.md v3.
+- Decisions D-001..D-010.
 
 ## Next
-0. Fold round 2 into SYNTHESIS; run independent reviewer subagent on SYNTHESIS + sources; fix; Phase 1 exit.
-1. (old) Parallel research rounds (grid context KSA, fault physics, protection, power flow & test feeders, thermal/assets, power quality/DER/arc flash, operations & safety & reliability, game design research).
-2. research/SYNTHESIS.md, then independent reviewer pass.
-3. Phase 2 org charters.
+1. Independent design review subagent (fun, accuracy, scope, feasibility) → resolve → Phase 3 exit.
+2. Phase 4: engine first (math/rng/topology/powerflow/shortcircuit/protection/fpi/thermal/reliability) with golden tests → docs/VALIDATION.md.
+3. Night Shift mode end-to-end; CI + Pages.
 
-## Known problems
-- None yet.
+## Known problems / open
+- Riyadh MV earthing practice, SEC FPI settings, crew times, cold-load pickup magnitude: not public → labelled assumptions.
+- `main` branch does not exist yet; Pages not enabled (see D-003).

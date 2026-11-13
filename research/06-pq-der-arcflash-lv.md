@@ -535,9 +535,9 @@ Source: IET Wiring Matters 2021 [PQ-46, verified].
   - governor/FCR ramp to full in 30 s (EU) [PQ-36];
   - DER loss-of-mains trips (RoCoF 0.125 Hz/s, vector shift) [PQ-29];
   - IEEE 1547 category-based trip/ride-through tables [PQ-37];
-  - a staged UFLS table. GB: 48.8 Hz start, 5 % blocks [PQ-29]. Saudi: **placeholder until the owner supplies values** [PQ-16].
+  - a staged UFLS table. GB: 48.8 Hz start, 5 % blocks [PQ-29]. Saudi: ~~**placeholder until the owner supplies values**~~ [superseded by D-004a: public source only] [PQ-16].
 - **Insulation coordination check:** compare the transient peak (switching, lightning, ferroresonance) with the equipment BIL from IEC 62271-1 Table 1a/1b [PQ-21]. Use Ur → (Ud, Up options) as a data table.
-- **Arc-flash calculator:** do **not** implement the IEEE 1584-2018 regression equations unless the owner supplies the standard. They are not in any fetched source. Use a teaching proxy, E ∝ t_clear, scaled from one owner-supplied reference point, and **label it as a proxy** in the UI.
+- **Arc-flash calculator:** do **not** implement the IEEE 1584-2018 regression equations ~~unless the owner supplies the standard~~ [superseded by D-004a: public source only]. They are not in any fetched source. Use a teaching proxy, E ∝ t_clear, scaled from one owner-supplied reference point, and **label it as a proxy** in the UI.
 - **LV protection:**
   - MCB instantaneous bands B/C/D [PQ-44].
   - RCD timing table [PQ-43].
@@ -546,8 +546,8 @@ Source: IET Wiring Matters 2021 [PQ-46, verified].
 
 ## Open questions
 
-1. **Saudi UFLS stage settings** (Hz and % per block) and the current Saudi Grid Code revision (2022+). Not public in the 2007 code [PQ-16]. Can the owner provide SEC/NGSA settings or the Distribution Code values?
-2. **IEC 62271-200 IAC acceptance criteria** (Annex A.6) are unverified. Can the owner confirm from a copy, or from a type-test report of the MRMU/RMU products he works with?
+1. **Saudi UFLS stage settings** (Hz and % per block) and the current Saudi Grid Code revision (2022+). Not public in the 2007 code [PQ-16]. ~~Can the owner provide~~ [superseded by D-004a: public source only] SEC/NGSA settings or the Distribution Code values?
+2. **IEC 62271-200 IAC acceptance criteria** (Annex A.6) are unverified. ~~Can the owner confirm from a copy, or from a type-test report of the MRMU/RMU products he~~ [superseded by D-004a: public source only] works with?
 3. **Rated insulation levels** in the current IEC 62271-1:2017+A1:2021. Are they unchanged from the 2007 Table 1a [PQ-21]? Which BIL option (e.g., 24 kV/125 kV vs 95 kV) does SEC specify for 13.8 kV and 33 kV gear? This needs the owner or SEC spec (e.g., 32-SDMS series).
 4. **IEEE 1584-2018 equations and coefficients**, for a faithful arc-flash calculator. They are paywalled. Is a proxy acceptable?
 5. **NFPA 70E current edition** (2024) table numbers and the 1.2 cal/cm² wording. Read only in snippets.
