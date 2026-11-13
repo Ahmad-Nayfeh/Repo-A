@@ -183,3 +183,4 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tcc-legend li { display: flex; align-items: center; gap: 6px; }
 .fault-key { color: var(--off); }
 @media (max-width: 600px) { .tcc .axis { font-size: 16px; } }
+@media (max-width: 600px) { .tcc .axis { font-size: 20px; } .tcc .fault-label { font-size: 22px; } .grading .board { gap: 8px; } }

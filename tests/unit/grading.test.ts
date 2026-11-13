@@ -6,9 +6,9 @@ describe('Grading mode engine', () => {
     for (let seed = 1; seed <= 30; seed++) {
       const g = generateGrading(seed);
       const c = (id: string) => g.cases.find((x) => x.id === id)!.iA;
-      expect(c('lv-max')).toBeLessThan(c('cable-max'));
-      expect(c('cable-max')).toBeLessThan(c('bus-max'));
-      for (const w of ['lv', 'cable', 'bus']) expect(c(`${w}-min`)).toBeLessThan(c(`${w}-max`));
+      expect(c('lv-max')).toBeLessThan(c('tee-max'));
+      expect(c('tee-max')).toBeLessThan(c('near-max'));
+      expect(c('lv-min')).toBeLessThan(c('lv-max')); expect(c('far-min')).toBeLessThan(c('tee-max')); expect(c('bus-min')).toBeLessThan(c('bus-max'));
       // bus 3PH max = c·Un/√3 / Zq ⇒ consistent with S''k (IEC 60909): I = S''k / (√3·Un)
       expect(Math.abs(c('bus-max') - (g.skMVA * 1e6) / (Math.sqrt(3) * 13.8e3)) / c('bus-max')).toBeLessThan(1e-9);
     }

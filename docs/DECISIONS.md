@@ -87,3 +87,11 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 
 ## D-017 — Condition-of-the-day rotation for the daily (2026-11-13, D3-04)
 - Seven conditions cycle by UTC day: standard, solidly earthed district, heat (40 °C ground, 15:00 summer), one crew, SCADA comms trouble, stale indicators, digger strike with damage report. Each is a generator override; every condition is gated by the reference bot finishing 20/20 seeds (tests/property/nightshift.test.ts).
+
+## D-018 — Grading review fixes (2026-11-13, docs/qc/REVIEW-grading.md)
+- GR-01: margins now checked at the close-in feeder fault (busbar level: feeder vs incomer) and at the RMU tee-off side (cable-end level: tee-off vs feeder).
+- GR-02: LV-terminal faults are no longer scored for speed; the tee-off must take ≥ 0.4 s there (LV discrimination [A]) and ≤ 2 s (transformer withstand, SEC 51-SDMS-04 [V]).
+- GR-03: high-set must be ≥ 1.3 × max LV fault (no reach through the transformer).
+- GR-04/GR-12: LV minimum = LV earth fault seen as 1/√3 through Dyn11 [D]; minimum cases use 0.5 × S″k (one grid transformer out) [D].
+- GR-05: number fields commit on change, no per-keystroke clamping. GR-08: Arabic "incomer" = قاطع الوارد, bidi-isolated reference line. GR-09: score named "relay operating time". GR-11: duplicate/∞ messages fixed. GR-13/15: CT simplification and greedy (non-optimal) reference stated in the UI.
+- **GR-06 partly rejected with reasons:** a backup ≤ 2 s rule is enforced for MV faults; for LV-terminal faults on small transformers it is physically infeasible with inverse-time feeder relays (fault current ≈ feeder load, e.g. 445 A vs 300 A for 500 kVA), which is exactly why the tee-off breaker is the transformer's protection. Stated in-game.

@@ -66,15 +66,15 @@ export function Grading({ seed, initial, onExit }: { seed: number; initial: stri
                 <label>{t('grCurve')} <select value={st[k].curve} onChange={(e) => upd(k, { curve: (e.target as HTMLSelectElement).value as RelaySetting['curve'] })}>
                   {(['IEC_SI', 'IEC_VI', 'IEC_EI'] as const).map((c) => <option key={c} value={c}>{t(`curve_${c}`)}</option>)}
                 </select></label>
-                <label>{t('grPickup')} <input type="number" inputMode="numeric" dir="ltr" min={1} step={1} value={st[k].pickupA} onInput={(e) => upd(k, { pickupA: Math.max(1, Number((e.target as HTMLInputElement).value)) })} /></label>
-                <label>TMS <input type="number" inputMode="decimal" dir="ltr" min={0.05} max={1} step={0.025} value={st[k].tms} onInput={(e) => upd(k, { tms: Math.min(1, Math.max(0.05, Number((e.target as HTMLInputElement).value))) })} /></label>
+                <label>{t('grPickup')} <input type="number" inputMode="numeric" dir="ltr" min={1} step={1} value={st[k].pickupA} onChange={(e) => { const v = Number((e.target as HTMLInputElement).value); if (Number.isFinite(v) && v >= 1) upd(k, { pickupA: Math.round(v) }); else (e.target as HTMLInputElement).value = String(st[k].pickupA); }} /></label>
+                <label>TMS <input type="number" inputMode="decimal" dir="ltr" min={0.05} max={1} step={0.025} value={st[k].tms} onChange={(e) => { const v = Number((e.target as HTMLInputElement).value); if (Number.isFinite(v) && v >= 0.05 && v <= 1) upd(k, { tms: v }); else (e.target as HTMLInputElement).value = String(st[k].tms); }} /></label>
               </div>
               {k === 'T' && (
                 <div class="row">
-                  <label class="toggle"><input type="checkbox" checked={st.T.hsA !== undefined} onChange={(e) => upd('T', (e.target as HTMLInputElement).checked ? { hsA: Math.ceil(1.3 * g.cases.find((c) => c.id === 'lv-max')!.iA), hsDelayS: 0.05 } : { hsA: undefined, hsDelayS: undefined })} /> {t('grHighSet')}</label>
+                  <label class="toggle"><input type="checkbox" checked={st.T.hsA !== undefined} onChange={(e) => upd('T', (e.target as HTMLInputElement).checked ? { hsA: Math.ceil(1.3 * g.lvMaxA), hsDelayS: 0.05 } : { hsA: undefined, hsDelayS: undefined })} /> {t('grHighSet')}</label>
                   {st.T.hsA !== undefined && <>
-                    <label>{t('grHsA')} <input type="number" dir="ltr" min={1} value={st.T.hsA} onInput={(e) => upd('T', { hsA: Number((e.target as HTMLInputElement).value) })} /></label>
-                    <label>{t('grHsDelay')} <input type="number" dir="ltr" min={0} max={1} step={0.01} value={st.T.hsDelayS} onInput={(e) => upd('T', { hsDelayS: Number((e.target as HTMLInputElement).value) })} /></label>
+                    <label>{t('grHsA')} <input type="number" dir="ltr" min={1} value={st.T.hsA} onChange={(e) => { const v = Number((e.target as HTMLInputElement).value); if (Number.isFinite(v) && v >= 1) upd('T', { hsA: Math.round(v) }); else (e.target as HTMLInputElement).value = String(st.T.hsA); }} /></label>
+                    <label>{t('grHsDelay')} <input type="number" dir="ltr" min={0} max={1} step={0.01} value={st.T.hsDelayS} onChange={(e) => { const v = Number((e.target as HTMLInputElement).value); if (Number.isFinite(v) && v >= 0 && v <= 1) upd('T', { hsDelayS: v }); else (e.target as HTMLInputElement).value = String(st.T.hsDelayS); }} /></label>
                   </>}
                 </div>
               )}
@@ -92,9 +92,9 @@ export function Grading({ seed, initial, onExit }: { seed: number; initial: stri
               {RELAYS.map((k) => { const tm = ev.times[c.id]![k]; return <td key={k} dir="ltr">{tm === undefined ? '' : Number.isFinite(tm) ? `${fmt(tm, 3)} s` : '—'}</td>; })}</tr>
           ))}</tbody>
         </table>
-        <ul class="checks">{ev.checks.filter((c) => !c.ok).map((c, i) => <li key={i} class="warn-text">✗ {t(`grChk_${c.id}`, { relay: t(`gr_${c.relay}`), case: c.caseId ? t(`grCase_${c.caseId.split('-')[0]}`) : '', value: c.value === undefined ? '' : fmt(c.value, 3), limit: c.limit === undefined ? '' : fmt(c.limit, 3) })}</li>)}
+        <ul class="checks">{ev.checks.filter((c) => !c.ok).filter((c, i, arr) => arr.findIndex((x) => x.id === c.id && x.relay === c.relay && x.caseId === c.caseId) === i).map((c, i) => <li key={i} class="warn-text">✗ {t(`grChk_${c.id}`, { relay: t(`gr_${c.relay}`), case: c.caseId ? t(`grCase_${c.caseId.split('-')[0]}`) : '', value: c.value === undefined || !Number.isFinite(c.value) ? '∞' : fmt(c.value, 3), limit: c.limit === undefined ? '' : fmt(c.limit, 3) })}</li>)}
           {ev.ok && <li>✅ {t('grAllOk', { cti: fmt(CTI_S, 2), max: fmt(MAX_CLEAR_S) })}</li>}</ul>
-        {showPar && par && <p class="muted">{t('grPar', { s: fmt(parScore, 3) })} — {RELAYS.map((k) => `${t(`gr_${k}`)}: ${t(`curve_${par.settings[k].curve}`)}, ${par.settings[k].pickupA} A, TMS ${par.settings[k].tms}${par.settings[k].hsA ? `, ${t('grHighSet')} ${par.settings[k].hsA} A` : ''}`).join(' · ')}</p>}
+        {showPar && par && <div class="muted"><p>{t('grPar', { s: fmt(parScore, 3) })}</p><ul>{RELAYS.map((k) => <li key={k}>{t(`gr_${k}`)}: {t(`curve_${par.settings[k].curve}`)} · <bdi dir="ltr">{par.settings[k].pickupA} A · TMS {par.settings[k].tms}{par.settings[k].hsA ? ` · HS ${par.settings[k].hsA} A` : ''}</bdi></li>)}</ul></div>}
         <div class="btns"><button onClick={async () => { try { await navigator.clipboard.writeText(`⚡ ${t('title')} · ${t('grading')} #${seed} · ${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${ev.ok ? `${fmt(ev.scoreS, 3)} s` : '—'}\n${link}`); setCopied(true); } catch { setCopied(false); } }}>{copied ? t('copied') : t('share')}</button></div>
         <p class="ruleset-note">{t('grNote')}</p>
       </section>
