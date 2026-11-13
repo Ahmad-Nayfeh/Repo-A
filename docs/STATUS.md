@@ -3,22 +3,25 @@
 _Last updated: 2026-11-13 (session 1)_
 
 ## Current phase
-Phase 5 — Verify & release (v1: engine + Night Shift). Two independent release reviews running (D-012).
+Loop (Phase 4→5): v1 released on the branch (Night Shift) + **Grading mode v1.1** added. Transformer thermal engine validated, waiting for its mode.
 
 ## What exists (evidence)
-- Playable game (Night Shift: training ×3, daily, free play easy/normal/hard), AR/EN, desktop + phone. Builds to a static site (53 KB gz JS).
-- Tests: 41 Vitest (unit, golden, gates) + 5 Playwright e2e; CI green on Chromium, Firefox, WebKit (run 43453723047: 15/15).
-- docs/VALIDATION.md (golden results), README with screenshots + gameplay GIF/MP4.
+- **Night Shift** (training ×3, daily, free play easy/normal/hard) and **Grading** (relay chain, TCC chart, reference grading), AR/EN, desktop + phone.
+- Tests: 64 Vitest (unit, golden, property, gates, replay) + 8 Playwright e2e (CI runs them on Chromium, Firefox, WebKit); `node scripts/check_sources.mjs` in CI (source IDs, S-ID coverage, employer-data check).
+- Golden results: docs/VALIDATION.md (power flow, short circuit, protection, reliability, thermal, grading).
+- Release reviews: physics/safety — PASS on re-verification; playtest/UX/Arabic — pass-after-fixes, leftovers fixed (log translation regression, hints, Arabic gender, tap sizes). Reports in docs/qc/.
+- README with screenshots + gameplay GIF/MP4 (refreshed after fixes).
 - Deployment: Pages workflow builds & tests OK; **blocked only by Pages not enabled** → docs/NEEDS-AHMAD.md §1.
 
 ## Gates passed (evidence)
 - Phase 1 exit: PASS — research/REVIEW-phase1.md §E.
-- Phase 3 exit: PASS — docs/design/REVIEW-phase3.md §H. v1 scope = D-011.
+- Phase 3 exit: PASS — docs/design/REVIEW-phase3.md §H.
+- Release 1 physics/safety: PASS — docs/qc/REVIEW-release1-physics-safety.md (Re-verification).
+- Release 1 playtest: pass-after-fixes → fixes applied — docs/qc/REVIEW-release1-playtest.md (Re-verification) + D-015.
 
-## Next
-1. Resolve findings of the release reviews (docs/qc/REVIEW-release1-*.md).
-2. Refresh README media if the UI changes.
-3. Roadmap items (docs/ROADMAP.md).
+## Next (priority)
+1. Independent review of Grading mode (physics + UX) and fix findings.
+2. Roadmap: home district & condition-of-the-day; earth-fault grading; Heatwave once LV transfer/demand response is modelled (D-016).
 
 ## Known problems / open
 - Riyadh MV earthing practice, SEC FPI settings, crew times, cold-load pickup magnitude: not public → labelled assumptions.

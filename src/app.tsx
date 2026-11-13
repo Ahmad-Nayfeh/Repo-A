@@ -24,6 +24,7 @@ export function App() {
   useEffect(() => {
     const on = () => setRoute(parseHash());
     window.addEventListener('hashchange', on);
+    on(); // catch a hash change that happened before the listener was attached
     return () => window.removeEventListener('hashchange', on);
   }, []);
   useEffect(() => { applyDocLang(); }, [lang.value]);
