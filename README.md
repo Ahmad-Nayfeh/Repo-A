@@ -6,7 +6,7 @@
 ### لعبة واقعية ثنائية اللغة لتشغيل شبكات التوزيع: حدِّد العطل، وحافظ على السلامة، وأعِد الكهرباء لكل مشترك.
 
 [![CI](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml/badge.svg?branch=claude/new-session-k41b2n)](https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-47%20unit%2Fgolden%2Fproperty%20%2B%2015%20e2e-brightgreen)
+![Tests](https://img.shields.io/badge/tests-50%20unit%2Fgolden%2Fproperty%20%2B%2018%20e2e-brightgreen)
 ![Physics](https://img.shields.io/badge/physics-validated%20against%20published%20references-blue)
 ![Languages](https://img.shields.io/badge/languages-العربية%20%7C%20English-orange)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -97,6 +97,7 @@ What makes the decisions interesting:
 - **Backfeed** at a summer peak can overload the healthy feeder and **trip it**. This is emergent from the power flow and the relay curve, not scripted.
 - **Waiting** for a crew is slow but certain. **Trial-closing** is fast but uses switchgear duty and is gated by safety rules.
 - **Stale indicators** that weren't reset after an earlier event can mislead you on Hard.
+- **Safety is procedural, not magic:** lock & tag → test for absence of voltage → earth → permit. A manual field switch can't be used to trial-close an unproven section; only the source breaker or a remote switch can, through the checklist.
 
 ---
 
@@ -112,7 +113,7 @@ Every engine model is checked against **published worked examples**. Excerpt fro
 | NER-limited earth fault | Dyn 33/11 kV worked example | 10,497 A solid → 399 A with 15.9 Ω | **10,497 A → 399.1 A** |
 | Relay curves | IEC 60255-151 / IEEE C37.112 (35 points) | e.g. SI 10.029 s @ 2× | **10.029 s** (±0.1 %) |
 | Reliability metric | Ofgem worked example | 34 min | **34 min** |
-| Determinism | same seed + actions on V8, SpiderMonkey, JavaScriptCore | identical | **identical (CI: 15/15)** |
+| Determinism | same seed + actions on V8, SpiderMonkey, JavaScriptCore | identical | **identical (CI, 3 engines)** |
 
 Every Saudi parameter carries a source ID ([`research/SOURCES.md`](research/SOURCES.md), ~420 entries) or is **labelled as an assumption** in the in-game Model notes. No proprietary or employer data is used.
 
@@ -195,6 +196,17 @@ The project was run like a small engineering organisation, with **independent re
 6. **Every decision logged:** [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ---
+
+## 🧪 Independent reviews
+
+Every phase was gated by a fresh-context reviewer, and every finding is tracked to a fix:
+
+| Gate | Findings | Report |
+|---|---|---|
+| Research | 31 (1 critical) → all fixed | [`research/REVIEW-phase1.md`](research/REVIEW-phase1.md) |
+| Design | 30 (2 critical) → all fixed | [`docs/design/REVIEW-phase3.md`](docs/design/REVIEW-phase3.md) |
+| Release: physics & safety | 18 → important ones fixed | [`docs/qc/REVIEW-release1-physics-safety.md`](docs/qc/REVIEW-release1-physics-safety.md) |
+| Release: playtest, UX & Arabic | 23 (2 critical) → fixed, regression-tested | [`docs/qc/REVIEW-release1-playtest.md`](docs/qc/REVIEW-release1-playtest.md) |
 
 ## ⚠️ Honest limitations
 
