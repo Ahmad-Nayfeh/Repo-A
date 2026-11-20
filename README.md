@@ -14,7 +14,7 @@
 
 <img src="docs/media/gameplay.gif" alt="Gameplay: a cable fault trips a feeder breaker; the player reads fault passage indicators, isolates the faulted cable, backfeeds the ring and earths the section for repair" width="900">
 
-<h3>▶️ <a href="https://ahmad-nayfeh.github.io/grid-shift/">Play now · العب الآن</a></h3>
+<h3>▶️ <a href="https://ahmadnayfeh.com/apps/grid-shift/app/">Play now · العب الآن</a></h3>
 
 <sub>▶️ Full-quality clip: <a href="docs/media/gameplay.mp4">docs/media/gameplay.mp4</a> · 🇸🇦 <a href="#-بالعربية">النسخة العربية أدناه</a></sub>
 
@@ -22,7 +22,7 @@
 
 ---
 
-> 🎬 **New:** a 4-minute Arabic explainer video (what it is, why it is useful, how to play): https://ahmad-nayfeh.github.io/grid-shift/about/
+> 🎬 **New:** a 4-minute Arabic explainer video (what it is, why it is useful, how to play): https://ahmadnayfeh.com/apps/grid-shift/#video
 
 ## Contents
 - [What is this?](#-what-is-this)
@@ -142,7 +142,7 @@ Every Saudi parameter carries a source ID ([`research/SOURCES.md`](research/SOUR
 
 ## 🎮 Play it
 
-**Online:** ▶️ **https://ahmad-nayfeh.github.io/grid-shift/**
+**Online:** ▶️ **https://ahmadnayfeh.com/apps/grid-shift/app/** (information page: https://ahmadnayfeh.com/apps/grid-shift/ · بالعربية: https://ahmadnayfeh.com/ar/apps/grid-shift/)
 
 **Locally** (Node 22):
 
@@ -164,6 +164,12 @@ npx vitest run
 ```bash
 npx playwright test --trace off
 ```
+
+**Publishing** (since 2026-11-20, see [docs/site-move.md](docs/site-move.md)): the game is published into the site repository `Ahmad-Nayfeh/ahmadnayfeh.com`, folder `public/apps/grid-shift/app/`:
+```bash
+scripts/deploy-site.sh /path/to/ahmadnayfeh.com-checkout
+```
+The script builds, empties and refills only that folder, runs `git pull --rebase`, commits and pushes to the site's `main`. The old `about/` page (explainer video page) is no longer published from here: its text and the video now live in the site repository (`content/apps/details/grid-shift.ts`, `public/apps/grid-shift/media/`), and the game's "watch the explainer" link goes to `../#video`.
 
 ---
 
@@ -282,7 +288,7 @@ Full list: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Current state: [`docs/STATUS.
 
 ### كيف تلعب؟
 
-- **عبر الإنترنت:** ▶️ https://ahmad-nayfeh.github.io/grid-shift/
+- **عبر الإنترنت:** ▶️ https://ahmadnayfeh.com/apps/grid-shift/app/ (صفحة اللعبة: https://ahmadnayfeh.com/ar/apps/grid-shift/)
 - **محليًا:** نفّذ الأوامر في قسم «Play it» أعلاه.
 
 الأوضاع المتاحة: **حلقة التدريب** (ثلاثة أعطال موجَّهة)، و**تحدّي اليوم** (البذرة نفسها للجميع)، و**اللعب الحر** بثلاثة مستويات صعوبة.

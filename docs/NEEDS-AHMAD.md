@@ -2,7 +2,11 @@
 
 Only items that truly need the owner. Nothing here asks for data (D-004a).
 
-## 1. ✅ DONE (2026-11-20) — GitHub Pages enabled; live at https://ahmad-nayfeh.github.io/Repo-A/
+## 0. Site move to ahmadnayfeh.com (2026-11-20): steps waiting for you
+
+See **docs/site-move.md → "Waiting for the owner"**: publish the new build, decide what to do with this repository's own GitHub Pages copy (`pages.yml`), decide about the in-game document links before making the repository private, and optionally re-render the video outro.
+
+## 1. ✅ DONE (2026-11-20) — GitHub Pages enabled for this repository (its own Pages address, `<owner>.github.io/Repo-A/`)
 
 (Original instructions kept for reference.)
 
@@ -12,7 +16,7 @@ Only items that truly need the owner. Nothing here asks for data (D-004a).
 1. Open https://github.com/Ahmad-Nayfeh/Repo-A/settings/pages
 2. Under **Build and deployment → Source**, choose **GitHub Actions** (not "Deploy from a branch").
 3. Open https://github.com/Ahmad-Nayfeh/Repo-A/actions/workflows/pages.yml and click **Run workflow** (branch: `claude/new-session-k41b2n`, or `main` once it exists) → **Run workflow**.
-4. When the run is green, the game is live at **https://ahmad-nayfeh.github.io/Repo-A/** (the exact URL is shown on the run's `deploy` job and on the Settings → Pages screen).
+4. When the run is green, the game is live at this repository's own Pages address, `/Repo-A/` on the owner's github.io host (the exact URL is shown on the run's `deploy` job and on the Settings → Pages screen).
 
 **If step 3 fails at the `deploy` job with "Branch … is not allowed to deploy to github-pages due to environment protection rules":**
 open https://github.com/Ahmad-Nayfeh/Repo-A/settings/environments → `github-pages` → **Deployment branches and tags** → add `claude/new-session-k41b2n` (or merge the branch into `main` and deploy from `main`), then re-run.
@@ -33,7 +37,7 @@ If you have 10 minutes, play Training 1–3 and one Hard free-play seed, and not
 
 ## 4. Making this repository private (optional, owner's choice)
 
-The game is now also served from the site repository at https://ahmad-nayfeh.github.io/grid-shift/ (built files only, no sourcemaps). After that address works, you can set this repository to private (Settings → General → Danger Zone → Change visibility). On the GitHub Free plan the old address /Repo-A/ will then stop; /grid-shift/ keeps working. Copies made while the repository was public under MIT cannot be withdrawn.
+The game is served from the site repository at https://ahmadnayfeh.com/apps/grid-shift/app/ (built files only, no sourcemaps). You can set this repository to private (Settings → General → Danger Zone → Change visibility). On the GitHub Free plan this repository's own Pages copy (/Repo-A/) will then stop; the copy on ahmadnayfeh.com keeps working. **But:** the game links to five documents in this repository (Model notes and About screens: FIDELITY.md, VALIDATION.md, SOURCES.md, SYNTHESIS.md, DECISIONS.md). Those links work only while the repository is public; decide what to do with them first (docs/site-move.md). Copies made while the repository was public under MIT cannot be withdrawn.
 
 ## 5. Optional: your own voice for the explainer video
 
