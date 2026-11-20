@@ -21,7 +21,6 @@ export function App() {
   const [theme, setThemeS] = useState(store.get('gs.theme') ?? 'dark');
   const [session, setSession] = useState<GameSession | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [gen, setGen] = useState(0);
   void lang.value;
 
   useEffect(() => {
@@ -70,12 +69,12 @@ export function App() {
   return (
     <main class="app">
       {notice && <div class="toast" role="status" onClick={() => setNotice(null)}>{notice}</div>}
-      {inGame && session && <Game key={`${route.path}?${route.q}#${gen}`} s={session} onExit={() => go('#/')}
+      {inGame && session && <Game key={`s${session.uid}`} s={session} onExit={() => go('#/')}
         onNext={session.mode === 'tutorial' ? () => go('#/training?t=0') : session.mode === 'training' && session.training < 2 ? () => go(`#/training?t=${session.training + 1}`) : undefined}
         onTakeOver={(acts: Action[]) => {
           const n = new GameSession({ mode: session.mode, seed: session.scenario.seed, difficulty: session.scenario.difficulty, training: session.training >= 0 ? session.training : undefined, date: session.date ?? undefined, replay: acts });
           n.help.demo = true; n.help.tier = 3;
-          setSession(n); setGen((g) => g + 1);
+          setSession(n);
         }} />}
       {inGame && !session && !notice && <p class="muted">{t('loading')}</p>}
       {route.path === '/' && <Home go={go} theme={theme} setTheme={setThemeS} />}

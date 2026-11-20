@@ -37,6 +37,8 @@ export function dailyCondition(date = todayUTC()) {
 /** Daily condition-of-the-day: Friday hard, otherwise normal (D3-04 rotation, minimal v1). */
 export function dailyDifficulty(date = todayUTC()): Difficulty { return new Date(`${date}T00:00:00Z`).getUTCDay() === 5 ? 'hard' : 'normal'; }
 
+let uidCounter = 0;
+
 export class GameSession {
   readonly scenario: Scenario;
   readonly sim: Simulation;
@@ -50,6 +52,8 @@ export class GameSession {
   readonly help = { tier: 0, demo: false };
 
   readonly ghost: boolean;
+  /** unique per session: the game screen remounts when the session changes */
+  readonly uid = ++uidCounter;
 
   constructor(opts: { mode: PlayMode; seed: number; difficulty: Difficulty; training?: number; date?: string; replay?: Action[]; ghost?: boolean }) {
     this.ghost = opts.ghost ?? false;

@@ -34,3 +34,7 @@ If you have 10 minutes, play Training 1–3 and one Hard free-play seed, and not
 ## 4. Making this repository private (optional, owner's choice)
 
 The game is now also served from the site repository at https://ahmad-nayfeh.github.io/grid-shift/ (built files only, no sourcemaps). After that address works, you can set this repository to private (Settings → General → Danger Zone → Change visibility). On the GitHub Free plan the old address /Repo-A/ will then stop; /grid-shift/ keeps working. Copies made while the repository was public under MIT cannot be withdrawn.
+
+## 5. Optional: your own voice for the explainer video
+
+The narration in the explainer video uses Microsoft's neural Arabic voice through the free `edge-tts` client (D-020). Microsoft does not clearly publish terms for this use outside the Edge browser. If you prefer zero doubt, record the 17 short lines in `video/script.json` with your phone (one file per line, any format), put them in `video/audio/<id>.mp3`, and the next session re-renders the video with your voice.

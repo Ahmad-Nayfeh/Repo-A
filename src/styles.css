@@ -419,3 +419,5 @@ button.big { min-height: 56px; padding: 0 22px; font-size: 1.1rem; border-radius
   .drawer { order: 2; }
 }
 @media (max-width: 860px) { .hud2 { position: static; } .guide .guide-text { font-size: .96rem; margin: 4px 0; } }
+.btn-link { display: inline-flex; align-items: center; gap: 8px; min-height: 56px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-weight: 600; }
+.btn-link:hover { border-color: var(--accent); }

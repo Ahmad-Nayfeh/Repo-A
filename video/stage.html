@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Grid Shift explainer stage</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root { --bg: #0b1020; --ink: #eef1f7; --muted: #a1abc0; --accent: #f2b84b; --accent2: #e8873a; --live: #47c2ff; --off: #ff6b6b; --good: #4cd08a; --win: #ffd27a; }
+  * { box-sizing: border-box; }
+  html { overflow: hidden; background: #0b1020; }
+  body { zoom: 1.5; width: 1280px; height: 720px; }
+  html, body { margin: 0; overflow: hidden; background: var(--bg); color: var(--ink); font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; }
+  .scene { position: absolute; inset: 0 0 92px 0; display: none; }
+  .scene.on { display: block; }
+  .bgglow { position: absolute; inset: 0; background: radial-gradient(700px 420px at 85% 0%, rgba(242,184,75,.18), transparent 65%), radial-gradient(600px 400px at 0% 100%, rgba(71,194,255,.12), transparent 65%); }
+  #cap { position: absolute; left: 0; right: 0; bottom: 0; height: 92px; display: flex; align-items: center; justify-content: center; padding: 0 48px; background: linear-gradient(0deg, #070b16, #0b1020); border-top: 1px solid rgba(255,255,255,.08); }
+  #cap p { margin: 0; font-size: 25px; line-height: 1.45; text-align: center; font-weight: 600; }
+  #brand { position: absolute; top: 14px; left: 18px; z-index: 50; display: flex; gap: 8px; align-items: center; font-size: 15px; color: var(--muted); }
+  #brand b { color: var(--accent); }
+  #prog { position: absolute; left: 0; bottom: 92px; height: 4px; background: var(--accent); width: 0; z-index: 60; }
+  h1, h2 { margin: 0; }
+  /* title */
+  #s-title .wrap { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 18px; }
+  #s-title .logo { width: 120px; height: 120px; animation: pop .8s cubic-bezier(.2,1.6,.4,1) both; }
+  #s-title h1 { font-size: 86px; font-weight: 800; letter-spacing: -.01em; animation: rise .8s .3s both; }
+  #s-title h1 span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  #s-title p { font-size: 30px; color: var(--muted); animation: rise .8s .6s both; }
+  #s-title .en { font-size: 22px; letter-spacing: .3em; color: var(--accent); animation: rise .8s .8s both; font-family: system-ui; direction: ltr; }
+  @keyframes pop { from { transform: scale(.3); opacity: 0; } }
+  @keyframes rise { from { transform: translateY(20px); opacity: 0; } }
+  /* infographic common */
+  .ig-title { position: absolute; top: 40px; right: 64px; font-size: 40px; font-weight: 800; }
+  .ig-title small { display: block; font-size: 18px; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+  /* problem */
+  #s-problem svg { position: absolute; left: 40px; right: 40px; top: 130px; width: 1200px; height: 480px; }
+  #s-problem .ig-title { z-index: 2; }
+  #s-problem svg { direction: ltr; }
+  .win { fill: var(--win); transition: fill .4s; }
+  .dark .win { fill: #222c42; }
+  .cable { stroke: var(--live); stroke-width: 7; stroke-linecap: round; filter: drop-shadow(0 0 8px var(--live)); transition: stroke .4s, filter .4s; }
+  .flowl { stroke: #fff; stroke-width: 2.5; stroke-dasharray: 3 22; animation: fl 1s linear infinite; }
+  @keyframes fl { to { stroke-dashoffset: -25; } }
+  .deadc .cable { stroke: #6d7b92; filter: none; stroke-dasharray: 14 10; }
+  .deadc .flowl { display: none; }
+  .spark { opacity: 0; }
+  .boom .spark { animation: spark .25s steps(2) 6; opacity: 1; }
+  @keyframes spark { 50% { opacity: .1; } }
+  .counter { font-size: 64px; font-weight: 800; fill: var(--off); }
+  .tag { font-size: 20px; fill: var(--muted); }
+  /* job */
+  #s-job .steps { position: absolute; top: 170px; left: 70px; right: 70px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .stepc { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 26px; padding: 30px; text-align: center; opacity: 0; transform: translateY(24px); transition: all .6s cubic-bezier(.2,1.3,.4,1); }
+  .stepc.in { opacity: 1; transform: none; }
+  .stepc .n { width: 64px; height: 64px; border-radius: 20px; margin: 0 auto 16px; display: grid; place-items: center; font-size: 34px; font-weight: 800; background: rgba(242,184,75,.15); color: var(--accent); }
+  .stepc svg { width: 120px; height: 90px; margin: 0 auto; display: block; }
+  .stepc h3 { font-size: 34px; margin: 10px 0 6px; }
+  .stepc p { font-size: 20px; color: var(--muted); margin: 0; line-height: 1.5; }
+  /* why */
+  #s-why .chips { position: absolute; top: 160px; right: 64px; left: 520px; display: flex; flex-wrap: wrap; gap: 14px; }
+  .chip { font-size: 26px; padding: 12px 22px; border-radius: 999px; border: 1.5px solid rgba(242,184,75,.5); background: rgba(242,184,75,.08); opacity: 0; transform: scale(.8); transition: all .5s cubic-bezier(.2,1.5,.4,1); }
+  .chip.in { opacity: 1; transform: none; }
+  #s-why .who { position: absolute; bottom: 40px; right: 64px; left: 64px; display: flex; gap: 22px; }
+  .who div { flex: 1; text-align: center; padding: 18px; border-radius: 20px; background: rgba(71,194,255,.07); border: 1px solid rgba(71,194,255,.3); font-size: 24px; opacity: 0; transition: opacity .6s; }
+  .who div.in { opacity: 1; }
+  .who svg { width: 44px; height: 44px; display: block; margin: 0 auto 8px; color: var(--live); }
+  #s-why .book { position: absolute; top: 150px; left: 70px; width: 400px; }
+  /* game frame */
+  #s-game { background: #070b16; }
+  #game { position: absolute; left: 0; top: 0; width: 1100px; height: 540px; border: 0; transform: scale(1.16364); transform-origin: 0 0; }
+  #cursor { position: absolute; z-index: 40; width: 34px; height: 34px; left: 640px; top: 400px; transition: left .9s cubic-bezier(.4,.1,.2,1), top .9s cubic-bezier(.4,.1,.2,1); pointer-events: none; display: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,.6)); }
+  #cursor.on { display: block; }
+  #cursor .ripple { position: absolute; left: -14px; top: -14px; width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--accent); opacity: 0; }
+  #cursor.click .ripple { animation: rip .6s ease-out; }
+  @keyframes rip { from { opacity: 1; transform: scale(.3); } to { opacity: 0; transform: scale(1.8); } }
+  .hl { position: absolute; z-index: 35; border: 4px solid var(--accent); border-radius: 16px; box-shadow: 0 0 0 9999px rgba(5,8,16,.55); transition: all .6s cubic-bezier(.4,.1,.2,1); pointer-events: none; display: none; }
+  .hl.on { display: block; }
+  .hl span { position: absolute; top: 100%; right: 0; margin-top: 10px; background: var(--accent); color: #1a1204; font-weight: 800; font-size: 20px; padding: 6px 14px; border-radius: 10px; white-space: nowrap; }
+  /* modes */
+  #s-modes .grid { position: absolute; top: 150px; left: 64px; right: 64px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .mode { border-radius: 24px; padding: 26px 22px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); opacity: 0; transform: translateY(20px); transition: all .6s; min-height: 260px; }
+  .mode.in { opacity: 1; transform: none; }
+  .mode svg { width: 54px; height: 54px; color: var(--accent); }
+  .mode h3 { font-size: 30px; margin: 14px 0 8px; }
+  .mode p { font-size: 20px; color: var(--muted); margin: 0; line-height: 1.5; }
+  #s-modes .stars { position: absolute; bottom: 36px; left: 64px; right: 64px; text-align: center; font-size: 26px; color: var(--muted); opacity: 0; transition: opacity .6s; }
+  #s-modes .stars.in { opacity: 1; }
+  #s-modes .stars b { color: var(--accent); font-size: 40px; letter-spacing: 6px; }
+  /* outro */
+  #s-outro .wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; }
+  #s-outro h2 { font-size: 64px; }
+  #s-outro .url { direction: ltr; font-size: 44px; font-weight: 800; color: #1a1204; background: linear-gradient(135deg, var(--accent), var(--accent2)); padding: 14px 34px; border-radius: 20px; font-family: system-ui, sans-serif; box-shadow: 0 20px 50px -20px var(--accent2); animation: pop .8s .3s cubic-bezier(.2,1.6,.4,1) both; }
+  #s-outro ul { list-style: none; display: flex; gap: 14px; padding: 0; margin: 10px 0 0; }
+  #s-outro li { font-size: 24px; padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); }
+</style>
+</head>
+<body>
+<div id="brand"><b>⚡</b> <span>مناوبة الشبكة · Grid Shift</span></div>
+
+<section class="scene" id="s-title"><div class="bgglow"></div><div class="wrap">
+  <svg class="logo" viewBox="0 0 108 108"><rect width="108" height="108" rx="24" fill="#0D1420" stroke="#2a3a55"/><path d="M22 54 C22 34 38 24 54 24 C70 24 86 34 86 54 C86 74 70 84 54 84 C38 84 22 74 22 54Z" fill="none" stroke="#47C2FF" stroke-width="4" stroke-dasharray="7 5"/><rect x="16" y="48" width="12" height="12" rx="3" fill="#F5B83D"/><rect x="80" y="48" width="12" height="12" rx="3" fill="#F5B83D"/><path fill="#F5B83D" d="M59 30 41 58h12l-5 20 18-28H54z"/></svg>
+  <h1>مُناوَبة <span>الشبكة</span></h1>
+  <p>لعبة متصفح مجانية: كن مهندس التحكم المناوب</p>
+  <div class="en">GRID SHIFT</div>
+</div></section>
+
+<section class="scene" id="s-problem"><div class="bgglow"></div>
+  <div class="ig-title"><small>المشكلة</small>عطل في كابل… والحيّ مظلم</div>
+  <svg viewBox="0 0 1200 500">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1426"/><stop offset="1" stop-color="#16223c"/></linearGradient></defs>
+    <rect x="0" y="0" width="1200" height="330" rx="20" fill="url(#sky)"/>
+    <g id="pb-city"></g>
+    <rect x="0" y="330" width="1200" height="170" rx="0" fill="#121a2b"/>
+    <text x="1180" y="362" class="tag" text-anchor="end">تحت الشارع: كابل 13.8 ك.ف</text>
+    <g id="pb-left"><line x1="150" y1="420" x2="640" y2="420" class="cable"/><line x1="150" y1="420" x2="640" y2="420" class="flowl"/></g>
+    <g id="pb-right"><line x1="640" y1="420" x2="1080" y2="420" class="cable"/><line x1="640" y1="420" x2="1080" y2="420" class="flowl"/></g>
+    <g transform="translate(70 380)"><rect width="90" height="80" rx="12" fill="#2a394f" stroke="#f2b84b" stroke-width="3"/><circle cx="35" cy="38" r="16" fill="none" stroke="#f2b84b" stroke-width="3"/><circle cx="55" cy="38" r="16" fill="none" stroke="#f2b84b" stroke-width="3"/><text x="45" y="104" text-anchor="middle" class="tag">محطة التحويل</text></g>
+    <g id="pb-cb" transform="translate(160 408)"><rect width="24" height="24" rx="4" fill="#eef1f7"/></g>
+    <g class="spark" id="pb-spark" transform="translate(640 420)"><circle r="26" fill="#ff6b6b" opacity=".35"/><path d="M6 -24 -12 4h12l-6 22 20-30H2z" fill="#fff"/></g>
+    <text id="pb-count" x="40" y="70" class="counter" text-anchor="start" opacity="0">0</text>
+    <text id="pb-count-l" x="40" y="102" class="tag" text-anchor="start" opacity="0">منزل بلا كهرباء</text>
+  </svg>
+</section>
+
+<section class="scene" id="s-job"><div class="bgglow"></div>
+  <div class="ig-title"><small>مهمّتك</small>أعِد الكهرباء… بأمان</div>
+  <div class="steps">
+    <div class="stepc"><div class="n">1</div><svg viewBox="0 0 120 90"><line x1="5" y1="60" x2="115" y2="60" stroke="#6d7b92" stroke-width="5" stroke-dasharray="10 7"/><path d="M30 60V20h22l-5 8 5 8H30" fill="#ffb547"/><path d="M80 60V20h22l-5 8 5 8H80" fill="none" stroke="#a1abc0" stroke-width="3"/><circle cx="58" cy="60" r="9" fill="#ff6b6b"/></svg><h3>حدِّد</h3><p>مؤشرات العطل تكشف أين توقّف تيار العطل</p></div>
+    <div class="stepc"><div class="n">2</div><svg viewBox="0 0 120 90"><line x1="5" y1="50" x2="40" y2="50" stroke="#a1abc0" stroke-width="5"/><line x1="40" y1="50" x2="60" y2="32" stroke="#f2b84b" stroke-width="5" stroke-linecap="round"/><line x1="80" y1="50" x2="115" y2="50" stroke="#a1abc0" stroke-width="5"/><line x1="80" y1="50" x2="100" y2="32" stroke="#f2b84b" stroke-width="5" stroke-linecap="round"/></svg><h3>اعزِل</h3><p>افتح المفتاحين على طرفي الكابل المعطوب</p></div>
+    <div class="stepc"><div class="n">3</div><svg viewBox="0 0 120 90"><line x1="5" y1="62" x2="115" y2="62" stroke="#47c2ff" stroke-width="5"/><g fill="#ffd27a"><path d="M14 46 26 34 38 46V58H14Z"/><path d="M48 46 60 34 72 46V58H48Z"/><path d="M82 46 94 34 106 46V58H82Z"/></g></svg><h3>أعِد</h3><p>غذِّ الأجزاء السليمة من محطتين مختلفتين</p></div>
+  </div>
+</section>
+
+<section class="scene" id="s-why"><div class="bgglow"></div>
+  <div class="ig-title"><small>لماذا هي مفيدة؟</small>تتعلّم الشبكة الحقيقية… باللعب</div>
+  <svg class="book" viewBox="0 0 400 300"><rect x="20" y="30" width="360" height="240" rx="22" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.15)"/><text x="200" y="95" text-anchor="middle" fill="#f2b84b" font-size="26" font-weight="800">مبنية على مراجع منشورة</text><text x="200" y="140" text-anchor="middle" fill="#a1abc0" font-size="20">IEC 60909 · IEC 60255 · IEEE</text><text x="200" y="175" text-anchor="middle" fill="#a1abc0" font-size="20">مواصفات توزيع منشورة</text><text x="200" y="225" text-anchor="middle" fill="#eef1f7" font-size="20">كل افتراض مكتوب في «ملاحظات النموذج»</text></svg>
+  <div class="chips"><span class="chip">الشبكات الحلقية</span><span class="chip">نقطة الفتح الطبيعية NOP</span><span class="chip">مؤشرات مرور العطل FPI</span><span class="chip">العزل والتأريض</span><span class="chip">تصاريح العمل</span><span class="chip">تنسيق الحماية</span></div>
+  <div class="who"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg>طلاب الهندسة</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-2a6 6 0 0 1 12 0v2"/><circle cx="10" cy="8" r="4"/><path d="M17 3l2 2 3-3"/></svg>المهندسون الجدد</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3 2.5V14M12 17h.01"/></svg>كل فضولي</div></div>
+</section>
+
+<section class="scene" id="s-game"><iframe id="game" title="game"></iframe><div class="hl" id="hl"><span></span></div>
+  <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/><circle class="ripple"/></svg>
+</section>
+
+<section class="scene" id="s-modes"><div class="bgglow"></div>
+  <div class="ig-title"><small>بعد الدروس</small>طرق أخرى للعب</div>
+  <div class="grid">
+    <div class="mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5h11l5 5v9z"/><path d="M8 13h8M8 9h4"/></svg><h3>الدروس</h3><p>أربعة دروس: من إعادة التغذية إلى التأريض والتصاريح</p></div>
+    <div class="mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><h3>تحدّي اليوم</h3><p>عطل جديد لكل اللاعبين، وشرط مختلف كل يوم</p></div>
+    <div class="mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20c4 0 6-16 18-16"/><path d="M3 20c6 0 9-10 18-10"/></svg><h3>تنسيق الحماية</h3><p>اضبط المرحّلات حتى يفصل الأقرب للعطل أولًا</p></div>
+    <div class="mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4l13 8-13 8z"/></svg><h3>اللعب الحر</h3><p>سهل، متوسط، صعب… وآلاف الشبكات المختلفة</p></div>
+  </div>
+  <div class="stars"><b>★★★</b><br>النجوم تقارن دقائق انقطاعك بخطة مرجعية</div>
+</section>
+
+<section class="scene" id="s-outro"><div class="bgglow"></div><div class="wrap">
+  <h2>ابدأ مناوبتك الآن</h2>
+  <div class="url">ahmad-nayfeh.github.io/grid-shift</div>
+  <ul><li>مجانية</li><li>بلا تسجيل</li><li>بلا إعلانات</li><li>جوال وكمبيوتر</li><li>عربي · English</li></ul>
+</div></section>
+
+<div id="prog"></div>
+<div id="cap"><p id="capt"></p></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const game = $('#game');
+const gdoc = () => game.contentDocument;
+const show = (id) => { document.querySelectorAll('.scene').forEach((s) => s.classList.toggle('on', s.id === id)); };
+async function waitFor(sel, t = 8000) { const t0 = Date.now(); while (Date.now() - t0 < t) { const e = gdoc()?.querySelector(sel); if (e) return e; await sleep(60); } throw new Error('not found ' + sel); }
+const K = 1.16364, Z = parseFloat(getComputedStyle(document.body).zoom) || 1;
+function rectOf(el) { const r = el.getBoundingClientRect(); const f = game.getBoundingClientRect(); return { x: r.left * K + f.left / Z, y: r.top * K + f.top / Z, w: r.width * K, h: r.height * K }; }
+const cur = $('#cursor');
+async function point(sel) { const el = typeof sel === 'string' ? await waitFor(sel) : sel; el.scrollIntoView({ block: 'nearest' }); await sleep(120); const r = rectOf(el); cur.classList.add('on'); cur.style.left = (r.x + r.w / 2 - 4) + 'px'; cur.style.top = (r.y + r.h / 2 - 2) + 'px'; await sleep(950); return el; }
+async function click(sel) { const el = await point(sel); cur.classList.remove('click'); void cur.offsetWidth; cur.classList.add('click'); await sleep(180); el.dispatchEvent(new MouseEvent('click', { bubbles: true })); await sleep(250); }
+const hl = $('#hl');
+async function highlight(sel, label, pad = 8) { const el = await waitFor(sel); const r = rectOf(el); hl.style.left = (r.x - pad) + 'px'; hl.style.top = (r.y - pad) + 'px'; hl.style.width = (r.w + 2 * pad) + 'px'; hl.style.height = (r.h + 2 * pad) + 'px'; hl.querySelector('span').textContent = label; hl.classList.add('on'); }
+const unhl = () => hl.classList.remove('on');
+const goGame = async (hash) => { game.contentWindow.location.hash = hash; await sleep(500); };
+
+// problem scene city
+(() => { const g = $('#pb-city'); const blocks = [[60, 150, 90, 180], [170, 100, 80, 230], [270, 170, 110, 160], [400, 120, 80, 210], [500, 190, 100, 140], [620, 90, 90, 240], [730, 160, 110, 170], [860, 110, 90, 220], [970, 180, 100, 150], [1090, 140, 70, 190]];
+  let html = ''; blocks.forEach(([x, y, w, h], i) => { html += `<g class="blk ${i >= 5 ? 'side-r' : 'side-l'}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1f2b44"/>`; for (let yy = y + 14; yy < y + h - 14; yy += 24) for (let xx = x + 10; xx < x + w - 14; xx += 18) html += `<rect class="win" x="${xx}" y="${yy}" width="9" height="12" rx="2"/>`; html += '</g>'; });
+  g.innerHTML = html; })();
+
+const scenes = {
+  async title() { show('s-title'); },
+  async problem(d) {
+    show('s-problem'); const svg = $('#s-problem svg');
+    await sleep(d * 0.35);
+    svg.classList.add('boom'); $('#pb-spark').classList.add('spark');
+    await sleep(900);
+    $('#pb-cb rect').setAttribute('fill', 'none'); $('#pb-cb rect').setAttribute('stroke', '#ff6b6b'); $('#pb-cb rect').setAttribute('stroke-width', '4');
+    $('#pb-left').classList.add('deadc'); $('#pb-right').classList.add('deadc');
+    document.querySelectorAll('#pb-city .blk').forEach((b, i) => setTimeout(() => b.classList.add('dark'), 120 * i));
+    const c = $('#pb-count'), cl = $('#pb-count-l'); c.setAttribute('opacity', 1); cl.setAttribute('opacity', 1);
+    for (let n = 0; n <= 265; n += 5) { c.textContent = n; await sleep(18); } c.textContent = '265';
+  },
+  async job(d) { show('s-job'); const cs = document.querySelectorAll('.stepc'); for (let i = 0; i < 3; i++) { cs[i].classList.add('in'); await sleep(d * 0.27); } },
+  async why(d) { show('s-why'); await sleep(1500); for (const c of document.querySelectorAll('.chip')) { c.classList.add('in'); await sleep(d * 0.055); } await sleep(d * 0.12); for (const w of document.querySelectorAll('.who div')) { w.classList.add('in'); await sleep(900); } },
+  async start(d) { show('s-game'); await sleep(d * 0.55); await click('button.big'); },
+  async tour(d) {
+    await waitFor('.guide'); await sleep(600);
+    await highlight('.goal', 'سطر الهدف'); await sleep(d * 0.18);
+    await highlight('.stats .stat:nth-child(1)', 'منازل بلا كهرباء'); await sleep(d * 0.13);
+    await highlight('.stats .stat:nth-child(2)', 'الوقت'); await sleep(d * 0.07);
+    await highlight('.stats .stat:nth-child(3)', 'نتيجتك'); await sleep(d * 0.17);
+    await highlight('.net', 'الخريطة', 2); await sleep(d * 0.12);
+    await highlight('.legend', 'دليل الرموز'); await sleep(d * 0.2);
+    unhl();
+  },
+  async l_intro(d) { await sleep(d * 0.6); await click('.guide button.primary'); },
+  async l_read(d) { await sleep(d * 0.25); await click('button.spot'); },
+  async l_bracket(d) { await sleep(d * 0.15); await highlight('.net', 'العطل بين الوحدتين 2 و 3', 2); await sleep(d * 0.55); unhl(); await click('.guide button.primary'); },
+  async l_near(d) { await sleep(d * 0.1); await point('.net .spot.swm-g'); await click('button.spot'); },
+  async l_far(d) { await sleep(d * 0.05); await click('button.spot'); },
+  async l_cb(d) { await sleep(d * 0.2); await click('button.spot'); },
+  async l_nop(d) { await sleep(d * 0.2); await click('button.spot'); },
+  async hints(d) {
+    await goGame('#/play?v=1&s=4242&d=normal'); await sleep(900);
+    await click('.hint-btn'); await sleep(d * 0.2);
+    await click('.guide.hint .btns button:not(.primary)'); await sleep(d * 0.15);
+    await click('.guide.hint .btns button:not(.primary)'); await sleep(900);
+    const spot = gdoc().querySelector('button.spot'); if (spot) await point(spot);
+  },
+  async demo(d) { await click('.guide.hint button.primary'); },
+  async modes(d) { show('s-modes'); const ms = document.querySelectorAll('.mode'); await sleep(1200); for (const m of ms) { m.classList.add('in'); await sleep(d * 0.17); } $('#s-modes .stars').classList.add('in'); },
+  async outro() { show('s-outro'); cur.classList.remove('on'); },
+};
+
+window.runStage = async (timeline) => {
+  try { game.contentWindow.localStorage.clear(); } catch {}
+  game.src = 'game/#/'; await new Promise((r) => game.addEventListener('load', r, { once: true }));
+  game.contentWindow.localStorage.setItem('gs.lang', 'ar'); game.contentWindow.location.reload(); await sleep(1200);
+  const total = timeline.reduce((a, s) => a + s.dur + s.pad, 0); let elapsed = 0;
+  const marks = [];
+  const t0 = performance.now();
+  for (const seg of timeline) {
+    const start = performance.now();
+    marks.push({ id: seg.id, t: (start - t0) / 1000 });
+    const cues = (seg.cues && seg.cues.length) ? seg.cues : [{ s: 0, e: seg.dur, text: seg.text }];
+    cues.forEach((c, k) => setTimeout(() => { $('#capt').textContent = c.text; }, k === 0 ? 0 : c.s * 1000));
+    const d = seg.dur * 1000;
+    const fn = scenes[seg.id]; const p = fn ? fn(d).catch((e) => console.error(seg.id, e)) : null;
+    const until = start + (seg.dur + seg.pad) * 1000;
+    while (performance.now() < until) { $('#prog').style.width = `${((elapsed + (performance.now() - start) / 1000) / total) * 100}%`; await sleep(100); }
+    await p; elapsed += seg.dur + seg.pad;
+  }
+  window.__marks = marks; window.__done = true;
+};
+</script>
+</body>
+</html>

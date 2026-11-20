@@ -22,6 +22,8 @@
 
 ---
 
+> 🎬 **New:** a 4-minute Arabic explainer video (what it is, why it is useful, how to play): https://ahmad-nayfeh.github.io/grid-shift/about/
+
 ## Contents
 - [What is this?](#-what-is-this)
 - [Screenshots](#-screenshots)

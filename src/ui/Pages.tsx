@@ -31,6 +31,7 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
             {nextLesson === 0 || nextLesson > 0
               ? <button class="primary big" onClick={() => go(lessonHref(Math.max(0, nextLesson)))}><Icon name="play" size={20} /> {nextLesson <= 0 ? t('startLesson1') : `${t('continueLearning')}: ${t('lessonN', { n: nextLesson + 1 })}`}</button>
               : <button class="primary big" onClick={() => go('#/daily')}><Icon name="play" size={20} /> {t('daily')}</button>}
+            <a class="btn-link" href="./about/#video"><Icon name="eye" size={18} /> {t('watchExplainer')}</a>
           </div>
         </div>
         <HeroArt />

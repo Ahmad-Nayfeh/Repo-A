@@ -282,4 +282,5 @@ export const ar: Record<keyof typeof en, string> = {
   playNow: 'العب', startLesson1: 'ابدأ: الدرس 1 (3 دقائق)', continueLearning: 'تابع التعلّم', lessonsTitle: 'الدروس', lessonN: 'الدرس {n}',
   homeLead: 'عطل في كابل قطع الكهرباء عن حيّ. أنت مهندس التحكم المناوب: حدّد العطل، واعزله، وأعِد الأنوار بأمان.',
   moreModes: 'طرق أخرى للعب',
+  watchExplainer: 'شاهد فيديو الشرح (4 دقائق)',
 };

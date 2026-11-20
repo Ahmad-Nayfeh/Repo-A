@@ -292,4 +292,5 @@ export const en = {
   playNow: 'Play', startLesson1: 'Start: Lesson 1 (3 min)', continueLearning: 'Continue learning', lessonsTitle: 'Lessons', lessonN: 'Lesson {n}',
   homeLead: 'A cable fault has cut power to a district. You are the control engineer on duty. Find the fault, isolate it and bring the lights back, safely.',
   moreModes: 'More ways to play',
+  watchExplainer: 'Watch the explainer (4 min, Arabic)',
 };

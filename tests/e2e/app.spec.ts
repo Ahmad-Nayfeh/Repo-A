@@ -151,3 +151,12 @@ test('hints: three tiers then the solution player; taking over continues the gam
   const help = await page.evaluate(() => (window as any).__gs.session().help);
   expect(help.demo).toBe(true);
 });
+
+test('lesson 1 → next lesson opens lesson 2 without the lesson 1 guide (regression)', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('gs.lang', 'en'));
+  await page.goto('/#/tutorial');
+  await expect(page.locator('.guide')).toContainText('Lesson 1');
+  await page.evaluate(() => { location.hash = '#/training?t=0'; });
+  await expect(page.locator('.hint-btn')).toBeVisible();
+  await expect(page.locator('.guide')).toHaveCount(0);
+});
