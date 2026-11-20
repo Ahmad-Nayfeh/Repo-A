@@ -30,3 +30,7 @@ The repository currently has a single branch, `claude/new-session-k41b2n`. The b
 ## 3. Optional (opinion only, not data): playtest checklist
 
 If you have 10 minutes, play Training 1–3 and one Hard free-play seed, and note: Was anything physically wrong? Was any Arabic term unnatural for SEC engineers? Was any decision boring or confusing? Put the notes in a GitHub issue; the next session will act on them. (Please do not share any employer or SEC-internal data — public documents only.)
+
+## 4. Making this repository private (optional, owner's choice)
+
+The game is now also served from the site repository at https://ahmad-nayfeh.github.io/grid-shift/ (built files only, no sourcemaps). After that address works, you can set this repository to private (Settings → General → Danger Zone → Change visibility). On the GitHub Free plan the old address /Repo-A/ will then stop; /grid-shift/ keeps working. Copies made while the repository was public under MIT cannot be withdrawn.

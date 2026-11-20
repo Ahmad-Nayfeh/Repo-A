@@ -14,7 +14,7 @@
 
 <img src="docs/media/gameplay.gif" alt="Gameplay: a cable fault trips a feeder breaker; the player reads fault passage indicators, isolates the faulted cable, backfeeds the ring and earths the section for repair" width="900">
 
-<h3>▶️ <a href="https://ahmad-nayfeh.github.io/Repo-A/">Play now · العب الآن</a></h3>
+<h3>▶️ <a href="https://ahmad-nayfeh.github.io/grid-shift/">Play now · العب الآن</a></h3>
 
 <sub>▶️ Full-quality clip: <a href="docs/media/gameplay.mp4">docs/media/gameplay.mp4</a> · 🇸🇦 <a href="#-بالعربية">النسخة العربية أدناه</a></sub>
 
@@ -140,7 +140,7 @@ Every Saudi parameter carries a source ID ([`research/SOURCES.md`](research/SOUR
 
 ## 🎮 Play it
 
-**Online:** ▶️ **https://ahmad-nayfeh.github.io/Repo-A/**
+**Online:** ▶️ **https://ahmad-nayfeh.github.io/grid-shift/**
 
 **Locally** (Node 22):
 
@@ -280,7 +280,7 @@ Full list: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Current state: [`docs/STATUS.
 
 ### كيف تلعب؟
 
-- **عبر الإنترنت:** ▶️ https://ahmad-nayfeh.github.io/Repo-A/
+- **عبر الإنترنت:** ▶️ https://ahmad-nayfeh.github.io/grid-shift/
 - **محليًا:** نفّذ الأوامر في قسم «Play it» أعلاه.
 
 الأوضاع المتاحة: **حلقة التدريب** (ثلاثة أعطال موجَّهة)، و**تحدّي اليوم** (البذرة نفسها للجميع)، و**اللعب الحر** بثلاثة مستويات صعوبة.
