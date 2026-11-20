@@ -4,11 +4,12 @@ import { Simulation, type Action, type ActionResult } from '../engine/sim';
 import { runBot } from '../engine/bot';
 import { fnv1a32 } from '../engine/rng';
 import { store } from '../i18n/i18n';
+import { TUTORIAL } from './tutorial';
 
 /** Engine + data version carried by every seed, share string and replay link (D-010). */
 export const ENGINE_VERSION = 1;
 
-export type PlayMode = 'daily' | 'training' | 'free';
+export type PlayMode = 'daily' | 'training' | 'free' | 'tutorial';
 
 export const TRAINING: { difficulty: Difficulty; seed: number; overrides: Partial<DifficultySpec>; hint: string }[] = [
   { difficulty: 'easy', seed: 101, overrides: { automated: 1, fpiType: 'three-phase', crews: 2 }, hint: 'tr1' },
@@ -45,12 +46,17 @@ export class GameSession {
   readonly training: number;
   readonly date: string | null;
   private parCache: number | null = null;
+  /** help used (not part of the replay; D-019): highest hint tier seen, and whether the guided solution was used */
+  readonly help = { tier: 0, demo: false };
 
-  constructor(opts: { mode: PlayMode; seed: number; difficulty: Difficulty; training?: number; date?: string; replay?: Action[] }) {
+  readonly ghost: boolean;
+
+  constructor(opts: { mode: PlayMode; seed: number; difficulty: Difficulty; training?: number; date?: string; replay?: Action[]; ghost?: boolean }) {
+    this.ghost = opts.ghost ?? false;
     this.mode = opts.mode;
     this.training = opts.training ?? -1;
     this.date = opts.date ?? null;
-    const ov = this.training >= 0 ? TRAINING[this.training]!.overrides : this.mode === 'daily' && this.date ? dailyCondition(this.date).overrides : {};
+    const ov = this.mode === 'tutorial' ? TUTORIAL.overrides : this.training >= 0 ? TRAINING[this.training]!.overrides : this.mode === 'daily' && this.date ? dailyCondition(this.date).overrides : {};
     this.scenario = generateScenario(opts.seed, opts.difficulty, ov);
     this.sim = new Simulation(this.scenario);
     // a replay already starts with the initial 'advance' (review G-01): never apply it twice
@@ -85,6 +91,12 @@ export class GameSession {
     if (!this.sim.complete) return 0;
     const m = this.sim.metrics();
     if (m.starEvents > 0) return 0;
+    const cap = this.help.demo ? 1 : this.help.tier >= 3 ? 2 : 3; // guided runs are "completed with guide"
+    return Math.min(cap, this.baseStars());
+  }
+
+  private baseStars(): number {
+    const m = this.sim.metrics();
     const par = this.par();
     // ★★★ also requires not running cables above rating longer than the reference strategy (review G-12, D-015)
     if (m.cmlOfgem <= par && m.overloadMin <= this.parOverload()) return 3;
@@ -94,7 +106,7 @@ export class GameSession {
 
   private done = false;
   private onComplete() {
-    if (this.done) return;
+    if (this.done || this.ghost) return; // demo sessions never write scores
     this.done = true;
     const m = this.sim.metrics();
     const key = `gs.best.${this.scenario.difficulty}`;
@@ -102,6 +114,7 @@ export class GameSession {
     if (m.cmlOfgem < best) store.set(key, String(m.cmlOfgem));
     if (this.mode === 'daily' && this.date) store.set(`gs.daily.${this.date}`, JSON.stringify({ cml: m.cmlOfgem, stars: this.stars() }));
     if (this.mode === 'training') store.set(`gs.training.${this.training}`, String(this.stars()));
+    if (this.mode === 'tutorial') store.set('gs.tutorial', '1');
   }
 
   replayUrl(): string {

@@ -6,6 +6,7 @@ import { dailyResult, todayUTC, ENGINE_VERSION, dailyCondition } from './session
 import type { Difficulty } from '../engine/scenario/district';
 import { isMuted, setMuted } from '../audio/synth';
 import { store } from '../i18n/i18n';
+import { Icon } from './icons';
 
 const REPO = 'https://github.com/ahmad-nayfeh/repo-a/blob/claude/new-session-k41b2n';
 
@@ -15,13 +16,34 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
   const [muted, setM] = useState(isMuted());
   const daily = dailyResult();
   const trainingStars = [0, 1, 2].map((i) => Number(store.get(`gs.training.${i}`) ?? 0));
+  const tutDone = store.get('gs.tutorial') === '1';
+  const nextLesson = !tutDone ? 0 : trainingStars.findIndex((x) => x === 0) + 1; // 0 = lesson 1 (tutorial); -1+1 = all done
+  const lessonHref = (n: number) => (n === 0 ? '#/tutorial' : `#/training?t=${n - 1}`);
+  const lessons = [{ n: 0, title: t('lesson1'), stars: tutDone ? 3 : 0 }, ...[0, 1, 2].map((i) => ({ n: i + 1, title: `${t('lessonN', { n: i + 2 })} · ${t(`trDesc${i}`)}`, stars: trainingStars[i]! }))];
   return (
     <div class="home">
-      <header class="hero">
-        <h1>⚡ {t('title')}</h1>
-        <p class="sub">{t('subtitle')}</p>
-        <p>{t('tagline')}</p>
+      <header class="hero2">
+        <div class="hero-text">
+          <p class="eyebrow">{t('subtitle')}</p>
+          <h1>{t('title')}</h1>
+          <p class="lead">{t('homeLead')}</p>
+          <div class="btns">
+            {nextLesson === 0 || nextLesson > 0
+              ? <button class="primary big" onClick={() => go(lessonHref(Math.max(0, nextLesson)))}><Icon name="play" size={20} /> {nextLesson <= 0 ? t('startLesson1') : `${t('continueLearning')}: ${t('lessonN', { n: nextLesson + 1 })}`}</button>
+              : <button class="primary big" onClick={() => go('#/daily')}><Icon name="play" size={20} /> {t('daily')}</button>}
+          </div>
+        </div>
+        <HeroArt />
       </header>
+      <section class="lessons card">
+        <h2>{t('lessonsTitle')}</h2>
+        <ol class="lesson-list">
+          {lessons.map((l) => (
+            <li key={l.n}><button onClick={() => go(lessonHref(l.n))}><span class="ln">{fmt(l.n + 1)}</span><span class="lt">{l.title}</span><span class="ls" aria-label={`${l.stars}/3`}>{[0, 1, 2].map((k) => <Icon key={k} name="star" size={14} class={k < l.stars ? 'on' : 'off'} />)}</span></button></li>
+          ))}
+        </ol>
+      </section>
+      <h2 class="section-h">{t('moreModes')}</h2>
       <section class="cards">
         <article class="card">
           <h2>{t('daily')}</h2>
@@ -31,12 +53,7 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
             : <button class="primary" onClick={() => go('#/daily')}>{t('play')}</button>}
         </article>
         <article class="card">
-          <h2>{t('training')}</h2>
-          <p>{t('trainingDesc')}</p>
-          <div class="btns">{[0, 1, 2].map((i) => <button key={i} onClick={() => go(`#/training?t=${i}`)} title={t(`trDesc${i}`)}>{fmt(i + 1)} · {t(`trDesc${i}`)} {'★'.repeat(trainingStars[i]!)}</button>)}</div>
-        </article>
-        <article class="card">
-          <h2>⚖️ {t('grading')} <span class="badge">{t('newBadge')}</span></h2>
+          <h2>{t('grading')}</h2>
           <p>{t('gradingDesc')}</p>
           <button class="primary" onClick={() => go(`#/grading?s=${seed || '1'}`)}>{t('play')}</button>
         </article>
@@ -58,7 +75,7 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
           <label>{t('language')} <select value={lang.value} onChange={(e) => setLang((e.target as HTMLSelectElement).value as 'en' | 'ar')}><option value="ar">العربية</option><option value="en">English</option></select></label>
           <label>{t('digitsLabel')} <select value={digits.value} onChange={(e) => setDigits((e.target as HTMLSelectElement).value as 'latn' | 'arab')}><option value="latn">{t('digitsLatn')}</option><option value="arab">{t('digitsArab')}</option></select></label>
           <label>{t('theme')} <select value={theme} onChange={(e) => setTheme((e.target as HTMLSelectElement).value)}><option value="dark">{t('themeDark')}</option><option value="light">{t('themeLight')}</option></select></label>
-          <label class="toggle"><input type="checkbox" checked={!muted} onChange={(e) => { const m = !(e.target as HTMLInputElement).checked; setMuted(m); setM(m); }} /> 🔔 {t('soundLabel')}</label>
+          <label class="toggle"><input type="checkbox" checked={!muted} onChange={(e) => { const m = !(e.target as HTMLInputElement).checked; setMuted(m); setM(m); }} /> {t('soundLabel')}</label>
         </div>
       </section>
       <nav class="links">
@@ -163,5 +180,31 @@ export function About({ go }: { go: (h: string) => void }) {
       </ul>
       <p class="muted" dir="ltr">Engine version {ENGINE_VERSION} · Fonts: Noto Sans Arabic (SIL OFL 1.1) · Preact (MIT)</p>
     </div>
+  );
+}
+
+/** Decorative hero illustration: a district at night, one street dark, a cable glowing to it (drawn for this project). */
+function HeroArt() {
+  const blocks: [number, number, number, number][] = [[8, 52, 14, 30], [26, 40, 12, 42], [42, 58, 16, 24], [62, 34, 12, 48], [78, 48, 14, 34], [96, 56, 12, 26], [112, 42, 14, 40]];
+  return (
+    <svg class="hero-art" viewBox="0 0 132 90" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1426" /><stop offset="1" stop-color="#1b2a48" /></linearGradient>
+        <filter id="hg"><feGaussianBlur stdDeviation="1.2" /></filter>
+      </defs>
+      <rect width="132" height="90" rx="8" fill="url(#sky)" />
+      <circle cx="112" cy="14" r="5" fill="#f3e6c4" opacity=".85" />
+      {blocks.map(([x, y, w, h], i) => {
+        const dark = i === 3 || i === 4;
+        const wins = [];
+        for (let yy = y + 4; yy < y + h - 4; yy += 6) for (let xx = x + 2.5; xx < x + w - 3; xx += 4.5) wins.push(<rect key={`${xx}-${yy}`} x={xx} y={yy} width="2" height="2.6" rx=".4" class={dark ? 'hw dark' : (Math.floor(xx * 7 + yy * 3) % 5 === 0 ? 'hw dim' : 'hw')} />);
+        return <g key={i}><rect x={x} y={y} width={w} height={h} fill={dark ? '#141c2c' : '#1f2b44'} />{wins}</g>;
+      })}
+      <rect x="0" y="80" width="132" height="10" fill="#0d1322" />
+      <path d="M4 85 H58" class="hc live" filter="url(#hg)" /><path d="M4 85 H58" class="hc live" />
+      <path d="M58 85 H92" class="hc dead" />
+      <path d="M92 85 H128" class="hc live" />
+      <g transform="translate(58 85)"><circle r="3" class="spark" /><path d="M-1 -2 1 -0.2 -0.6 0.4 1 2.2" stroke="#fff" stroke-width=".7" fill="none" /></g>
+    </svg>
   );
 }

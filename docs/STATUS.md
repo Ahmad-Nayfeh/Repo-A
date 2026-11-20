@@ -3,7 +3,7 @@
 _Last updated: 2026-11-13 (session 1)_
 
 ## Current phase
-Loop (Phase 4→5): v1 released on the branch (Night Shift) + **Grading mode v1.1** added. Transformer thermal engine validated, waiting for its mode.
+v2 player experience shipped (D-019): Lesson 1, goal line, tiered hints, solution player, readable mimic. Next: Arabic narrated explainer video (owner request), then phase 2 (3D view, research/14).
 
 ## What exists (evidence)
 - **Night Shift** (training ×3, daily, free play easy/normal/hard) and **Grading** (relay chain, TCC chart, reference grading), AR/EN, desktop + phone.

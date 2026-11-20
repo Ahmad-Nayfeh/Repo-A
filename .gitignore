@@ -4,3 +4,4 @@ test-results/
 playwright-report/
 .cache/
 tests/golden/.fetched/
+.scratch/

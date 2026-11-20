@@ -7,6 +7,8 @@ import { GameSession, dailySeed, dailyDifficulty, todayUTC, decodeActions, TRAIN
 import type { Difficulty } from './engine/scenario/district';
 import { generateScenario } from './engine/scenario/district';
 import { runBot } from './engine/bot';
+import { TUTORIAL } from './ui/tutorial';
+import type { Action } from './engine/sim';
 
 function parseHash(): { path: string; q: URLSearchParams } {
   const h = location.hash.replace(/^#/, '') || '/';
@@ -19,6 +21,7 @@ export function App() {
   const [theme, setThemeS] = useState(store.get('gs.theme') ?? 'dark');
   const [session, setSession] = useState<GameSession | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [gen, setGen] = useState(0);
   void lang.value;
 
   useEffect(() => {
@@ -34,7 +37,9 @@ export function App() {
   useEffect(() => {
     const { path, q } = route;
     setNotice(null);
-    if (path === '/daily') {
+    if (path === '/tutorial') {
+      setSession(new GameSession({ mode: 'tutorial', seed: TUTORIAL.seed, difficulty: TUTORIAL.difficulty }));
+    } else if (path === '/daily') {
       const date = todayUTC();
       setSession(new GameSession({ mode: 'daily', seed: dailySeed(date), difficulty: dailyDifficulty(date), date }));
     } else if (path === '/training') {
@@ -61,11 +66,17 @@ export function App() {
     botActions: (seed: number, d: Difficulty) => runBot(generateScenario(seed, d)).actions,
   };
   const go = (h: string) => { location.hash = h; };
-  const inGame = ['/daily', '/training', '/play'].includes(route.path);
+  const inGame = ['/daily', '/training', '/play', '/tutorial'].includes(route.path);
   return (
     <main class="app">
       {notice && <div class="toast" role="status" onClick={() => setNotice(null)}>{notice}</div>}
-      {inGame && session && <Game key={`${route.path}?${route.q}`} s={session} onExit={() => go('#/')} onNext={session.mode === 'training' && session.training < 2 ? () => go(`#/training?t=${session.training + 1}`) : undefined} />}
+      {inGame && session && <Game key={`${route.path}?${route.q}#${gen}`} s={session} onExit={() => go('#/')}
+        onNext={session.mode === 'tutorial' ? () => go('#/training?t=0') : session.mode === 'training' && session.training < 2 ? () => go(`#/training?t=${session.training + 1}`) : undefined}
+        onTakeOver={(acts: Action[]) => {
+          const n = new GameSession({ mode: session.mode, seed: session.scenario.seed, difficulty: session.scenario.difficulty, training: session.training >= 0 ? session.training : undefined, date: session.date ?? undefined, replay: acts });
+          n.help.demo = true; n.help.tier = 3;
+          setSession(n); setGen((g) => g + 1);
+        }} />}
       {inGame && !session && !notice && <p class="muted">{t('loading')}</p>}
       {route.path === '/' && <Home go={go} theme={theme} setTheme={setThemeS} />}
       {route.path === '/grading' && <Grading key={route.q.get('s') ?? '1'} seed={Number(route.q.get('s') ?? 1) >>> 0} initial={route.q.get('r')} onExit={() => go('#/')} />}

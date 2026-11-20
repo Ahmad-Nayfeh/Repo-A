@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import type { GameSession } from './session';
 import { t, fmt } from '../i18n/i18n';
 
-export function Results({ s, onExit, onBack, onNext }: { s: GameSession; onExit: () => void; onBack: () => void; onNext?: () => void }) {
+export function Results({ s, onExit, onBack, onNext, onWatch }: { s: GameSession; onExit: () => void; onBack: () => void; onNext?: () => void; onWatch?: () => void }) {
   const sim = s.sim;
   const m = sim.metrics();
   const par = s.par();
@@ -26,6 +26,7 @@ export function Results({ s, onExit, onBack, onNext }: { s: GameSession; onExit:
       <h2>{t('results')}</h2>
       <p class="stars" aria-label={`${t('stars')}: ${stars}/3`}>{'★'.repeat(stars)}{'☆'.repeat(3 - stars)}</p>
       <p class="muted">{t('starsRule')}</p>
+      {(s.help.demo || s.help.tier >= 3) && <p class="warn-text">{t('completedWithGuide')}</p>}
       <table class="metrics">
         <tbody>
           {row(t('yourCml'), fmt(m.cmlOfgem))}
@@ -47,6 +48,7 @@ export function Results({ s, onExit, onBack, onNext }: { s: GameSession; onExit:
       <div class="btns">
         <button class="primary" onClick={copy}>{copied ? t('copied') : t('share')}</button>
         {onNext && <button onClick={onNext}>{t('nextTraining')}</button>}
+        {onWatch && <button onClick={onWatch}>{t('watchExpert')}</button>}
         <button onClick={onBack}>{t('networkView')}</button>
         <button onClick={onExit}>{t('menu')}</button>
       </div>
