@@ -2,7 +2,9 @@
 
 Only items that truly need the owner. Nothing here asks for data (D-004a).
 
-## 1. Enable GitHub Pages (one-time, ~1 minute) — needed for the public link
+## 1. ✅ DONE (2026-11-20) — GitHub Pages enabled; live at https://ahmad-nayfeh.github.io/Repo-A/
+
+(Original instructions kept for reference.)
 
 **Why:** the deploy workflow builds and tests successfully, but GitHub refuses to publish because Pages is not enabled on the repository (Actions log: `Get Pages site failed … Not Found`). Enabling Pages is a repository setting this session cannot change.
 
