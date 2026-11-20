@@ -11,7 +11,7 @@ v2 player experience shipped (D-019): Lesson 1, goal line, tiered hints, solutio
 - Golden results: docs/VALIDATION.md (power flow, short circuit, protection, reliability, thermal, grading).
 - Release reviews: physics/safety — PASS on re-verification; playtest/UX/Arabic — pass-after-fixes, leftovers fixed (log translation regression, hints, Arabic gender, tap sizes). Reports in docs/qc/.
 - README with screenshots + gameplay GIF/MP4 (refreshed after fixes).
-- Deployment: **LIVE** at https://ahmad-nayfeh.github.io/grid-shift/ (Pages run #21, verified in a browser 2026-11-20: training and grading load, no page errors).
+- Deployment: the game runs at https://ahmadnayfeh.com/apps/grid-shift/app/ and its information page is https://ahmadnayfeh.com/apps/grid-shift/ (moved from the old hub on 2026-11-20; publishing is `scripts/deploy-site.sh`; full record in docs/site-move.md).
 
 ## Gates passed (evidence)
 - Phase 1 exit: PASS — research/REVIEW-phase1.md §E.

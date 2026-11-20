@@ -8,7 +8,8 @@ import { isMuted, setMuted } from '../audio/synth';
 import { store } from '../i18n/i18n';
 import { Icon } from './icons';
 
-const REPO = 'https://github.com/ahmad-nayfeh/repo-a/blob/claude/new-session-k41b2n';
+// HEAD = the repository's default branch (today claude/new-session-k41b2n; `main` once it exists). See docs/site-move.md.
+const REPO = 'https://github.com/Ahmad-Nayfeh/Repo-A/blob/HEAD';
 
 export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: string; setTheme: (t: string) => void }) {
   const [diff, setDiff] = useState<Difficulty>('normal');
@@ -31,7 +32,7 @@ export function Home({ go, theme, setTheme }: { go: (h: string) => void; theme: 
             {nextLesson === 0 || nextLesson > 0
               ? <button class="primary big" onClick={() => go(lessonHref(Math.max(0, nextLesson)))}><Icon name="play" size={20} /> {nextLesson <= 0 ? t('startLesson1') : `${t('continueLearning')}: ${t('lessonN', { n: nextLesson + 1 })}`}</button>
               : <button class="primary big" onClick={() => go('#/daily')}><Icon name="play" size={20} /> {t('daily')}</button>}
-            <a class="btn-link" href="./about/#video"><Icon name="eye" size={18} /> {t('watchExplainer')}</a>
+            <a class="btn-link" href="../#video"><Icon name="eye" size={18} /> {t('watchExplainer')}</a>
           </div>
         </div>
         <HeroArt />

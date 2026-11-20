@@ -107,8 +107,15 @@ Format: **D-NNN — title** (date). Context → Decision → Alternatives reject
 - Reversible: yes. Engine unchanged; replays and determinism unaffected (help use is not part of the action list).
 
 ## D-020 — Arabic narrated explainer video (2026-11-20, owner request)
-- 4-minute 1080p video: what the game is, why it is useful, a full walk-through of Lesson 1, hints, the solution player, other modes. Published at https://ahmad-nayfeh.github.io/grid-shift/about/ (pattern of the other app intro pages), linked from the game's home and the hub card.
+- 4-minute 1080p video: what the game is, why it is useful, a full walk-through of Lesson 1, hints, the solution player, other modes. First published on the old hub under `grid-shift/about/`; since 2026-11-20 the video is on the game's page https://ahmadnayfeh.com/apps/grid-shift/#video (D-021), linked from the game's home.
 - Pipeline (video/): `script.json` (narration) → per-scene TTS → `stage.html` (animated infographic scenes + the real game in an iframe, driven step by step) → CDP screencast in real time (`record.cjs`) → ffmpeg (`encode.cjs`) with sentence-level captions (burned in + WebVTT).
 - **Voice:** Microsoft Edge neural voice ar-SA-Hamed via the `edge-tts` client. It was the only natural-sounding free Arabic voice reachable here. Licence caveat: the terms for using this online service outside Microsoft Edge are not clearly published (recorded in NEEDS-AHMAD §5). Rejected: Piper ar_JO "kareem" (base voice trained on the Blizzard-2013 Lessac data, non-commercial research licence; Arabic dataset licence not found), Meta MMS-TTS (CC-BY-NC). The page states the narration is synthetic.
 - Verification: Whisper (small) transcription of every clip matched the script; station letters "A/B" were respelled after the check. Frames of every scene were inspected.
 - Reversible: yes. Re-recording with a human voice needs only new audio files (same script, `node record.cjs`).
+
+## D-021 — Game moved to ahmadnayfeh.com (2026-11-20, owner request)
+- The owner retired the hub repository `Ahmad-Nayfeh/Ahmad-Nayfeh.github.io`. The game now runs at https://ahmadnayfeh.com/apps/grid-shift/app/ and its information page (with the explainer video) is https://ahmadnayfeh.com/apps/grid-shift/ (Arabic: https://ahmadnayfeh.com/ar/apps/grid-shift/).
+- Changes: the home screen's explainer link is `../#video` (was `./about/#video`); `scripts/deploy-site.sh` publishes `dist/` to `public/apps/grid-shift/app/` in `Ahmad-Nayfeh/ahmadnayfeh.com`; the old `about/` page is no longer published (its text lives in the site repository, `content/apps/details/grid-shift.ts`); in-game document links use `blob/HEAD` of this repository instead of the working branch name.
+- No migration of saved progress (local storage is tied to the address; there were no players). No compatibility layer for the old address.
+- Full record, testing and what still waits for the owner: docs/site-move.md.
+- Reversible: yes.
