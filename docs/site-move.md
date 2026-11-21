@@ -96,38 +96,42 @@ Facts checked on 2026-11-20:
 So the links now use `blob/HEAD`, which follows the default branch. They work today and will keep working after
 `main` is created and made the default. They stop working for players if the repository is made private.
 
-## `.github/workflows/pages.yml`
+## `.github/workflows/pages.yml` (changed on 2026-11-21)
 
-It builds the game and deploys it to **this repository's own GitHub Pages site** (the `/Repo-A/` address on the
-owner's github.io host) on every push to `main` or `claude/new-session-k41b2n`, and on manual runs. It does not
-write to the old hub repository or to the new site. It was left as it is. On 2026-11-20 that Pages address still
-answered (HTTP 200), so a second public copy of the game exists there, at an address that is not the new site.
-Pushes to `claude/epic-feynman-hu09zj` do not trigger it. Whether to keep it is the owner's decision (below).
+Until 2026-11-21 this workflow built the game and deployed a **second public copy** to this repository's own
+GitHub Pages address (the `/Repo-A/` address on the owner's github.io host). Two public copies at two addresses
+confuse players and search engines, and the copy could drift from the real one.
 
-## Waiting for the owner
+The owner left the decision to the session that did the move. Decision: the Pages address now only forwards.
 
-1. **Review and merge this branch.** `claude/epic-feynman-hu09zj` is pushed but not merged. Merge it into the
-   default branch (`claude/new-session-k41b2n`, or `main` if you create it). Note: a push to either of those
-   branches also runs `pages.yml` (item 3).
-2. **Publish.** A build of this branch was handed to the site work on 2026-11-20 (to be placed in
-   `public/apps/grid-shift/app/`). If the live game still shows the old explainer link, run
-   `scripts/deploy-site.sh <site checkout>` as described above. Check: on the live game's home screen, "Watch the
-   explainer" must open `https://ahmadnayfeh.com/apps/grid-shift/#video`.
-3. **Decide about this repository's own Pages copy.** If you do not want a second copy of the game on the
-   github.io address: Settings → Pages → unpublish the site (or set Source to "None"), then delete
-   `.github/workflows/pages.yml` in a commit. If you want to keep it as a preview, do nothing.
-4. **Decide about the in-game document links before making the repository private.** They only work while this
-   repository is public. Options: keep the repository public; or copy the five documents to a public place and
-   change `REPO` in `src/ui/Pages.tsx`; or remove the links from the two screens. Nothing was removed.
-5. **Optional: create `main`** and make it the default branch (see `docs/NEEDS-AHMAD.md` §2). The in-game links
-   need no change for that. The CI badge in `README.md` names the branch `claude/new-session-k41b2n`; change it to
-   `main` at the same time.
-6. **Optional: the video outro.** The published video
-   (`public/apps/grid-shift/media/grid-shift-explainer-ar.mp4` in the site repository) still shows the old address
-   `ahmad-nayfeh.github.io/grid-shift` on its last scene. The old address forwards to the new site, so it still
-   leads somewhere. `video/stage.html` is already corrected; to fix the video itself, re-run the video pipeline
-   (D-020: `video/record.cjs`, `video/encode.cjs`, needs the TTS audio and ffmpeg) and replace the file in the site
-   repository by hand.
+- `pages-redirect/index.html` is a small page that sends the visitor to
+  `https://ahmadnayfeh.com/apps/grid-shift/app/` and keeps the in-game route (the part after `#`).
+- `pages.yml` deploys only that folder (the same file also as `404.html`). It runs when `pages-redirect/` or the
+  workflow itself changes on the default branch, and on a manual run. It no longer builds or tests the game
+  (`ci.yml` does the tests).
+- The game is published only with `scripts/deploy-site.sh`.
+
+## Decisions taken on 2026-11-21 (the owner delegated them)
+
+1. **The repository stays public.** The game links to five documents here (Model notes and About screens). They
+   only open while the repository is public, the game is an educational project with no secrets, and it is under
+   the MIT licence. If it is ever made private, first move those documents somewhere public and change `REPO` in
+   `src/ui/Pages.tsx`, or remove the links.
+2. **The second copy was turned into a forwarding page** (section above).
+3. **The explainer video's last scene now shows the new address.** Only the outro was recorded again and joined
+   to the published video; the sound track is unchanged. Tool: `node video/outro-only.cjs <existing.mp4> <result.mp4>`.
+   It needs `video/serve/` (not in git) with a copy of `video/stage.html` and `fonts/fonts.css` plus the four
+   IBM Plex Sans Arabic `.woff2` files (400, 500, 600, 700; copies are in `app/font-files/` of the site
+   repository). Checked by looking at frames at 222 s (previous scene, untouched) and 230 s (new address). The new
+   file replaced `public/apps/grid-shift/media/grid-shift-explainer-ar.mp4` in the site repository; the subtitle
+   file did not change. For any other change to the video, use the full pipeline (D-020).
+
+## Still waiting for the owner
+
+1. **Optional: create `main`** and make it the default branch (see `docs/NEEDS-AHMAD.md` section 2). The in-game
+   links need no change for that. The CI badge in `README.md` names the branch `claude/new-session-k41b2n`; change
+   it to `main` at the same time.
+2. Play the game once on a phone at `https://ahmadnayfeh.com/apps/grid-shift/app/` (not tested on a real device).
 
 ## How to test
 
