@@ -1,7 +1,11 @@
-name: Deploy to GitHub Pages
+# This repository's own GitHub Pages address (…github.io/Repo-A/) used to carry a second copy of the game.
+# Since 2026-11-21 it only forwards to the game on the owner's site (see docs/site-move.md).
+# The game itself is published with scripts/deploy-site.sh, not from here.
+name: Deploy forwarding page to GitHub Pages
 on:
   push:
     branches: [main, claude/new-session-k41b2n]
+    paths: ['pages-redirect/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,19 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm test
-        env:
-          CI: 'true'
-      - run: npx vite build
+      - run: cp pages-redirect/index.html pages-redirect/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: dist
+          path: pages-redirect
   deploy:
     needs: build
     runs-on: ubuntu-latest

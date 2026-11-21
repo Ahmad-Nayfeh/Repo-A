@@ -4,7 +4,7 @@ Only items that truly need the owner. Nothing here asks for data (D-004a).
 
 ## 0. Site move to ahmadnayfeh.com (2026-11-20): steps waiting for you
 
-See **docs/site-move.md → "Waiting for the owner"**: publish the new build, decide what to do with this repository's own GitHub Pages copy (`pages.yml`), decide about the in-game document links before making the repository private, and optionally re-render the video outro.
+See **docs/site-move.md**. On 2026-11-21 the open decisions were taken for you: the repository stays public, this repository's own GitHub Pages address now only forwards to the game on ahmadnayfeh.com, and the video's last scene shows the new address. What is left is in "Still waiting for the owner" there.
 
 ## 1. ✅ DONE (2026-11-20) — GitHub Pages enabled for this repository (its own Pages address, `<owner>.github.io/Repo-A/`)
 
